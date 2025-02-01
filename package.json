@@ -1,0 +1,20 @@
+{
+  "name": "nvidia-fe-tracker",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "build": "wrangler deploy --dry-run --outdir=dist",
+    "format": "prettier --write \"**/*.{js,ts,json,less,css,md,html}\"",
+    "format:check": "prettier --loglevel debug --check \"**/*.{js,ts,json,less,css,md,html}\""
+  },
+  "dependencies": {
+    "hono": "^4.6.20",
+    "mustache": "^4.2.0",
+    "prettier": "^3.4.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250109.0",
+    "@types/mustache": "^4.2.5",
+    "wrangler": "^3.101.0"
+  }
+}

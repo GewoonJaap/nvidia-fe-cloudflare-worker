@@ -40,7 +40,20 @@ export class NvidiaApi {
 
       for (const product of purchasableProducts) {
         product.fe_sku = sku;
-        await sendToNtfy(product, store, productApi, env, true);
+
+        const kvKey = `${store.country}_${sku}`;
+        const previousStatus = await env.NVIDIA_FE_KV.get(kvKey);
+        const isInStock = product.is_active != 'false';
+
+        if (isInStock && previousStatus !== 'in_stock') {
+          await sendToNtfy(product, store, productApi, env, true);
+          await env.NVIDIA_FE_KV.put(kvKey, 'in_stock');
+        } else if (!isInStock && previousStatus === 'in_stock') {
+          await env.NVIDIA_FE_KV.put(kvKey, 'out_of_stock');
+        } else if (isInStock && previousStatus === null) {
+          await sendToNtfy(product, store, productApi, env, true);
+          await env.NVIDIA_FE_KV.put(kvKey, 'in_stock');
+        }
       }
 
       results.push(...purchasableProducts);

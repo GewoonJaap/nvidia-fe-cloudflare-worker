@@ -9,6 +9,11 @@ export const NVIDIA_STORES: NvidiaStore[] = [
         consumerUrl: 'https://marketplace.nvidia.com/nl-nl/consumer/graphics-cards/nvidia-geforce-rtx-5090/',
         name: 'Nvidia RTX 5090 Founders Edition',
       },
+      {
+        url: 'https://api.store.nvidia.com/partner/v1/feinventory?skus=',
+        consumerUrl: 'https://marketplace.nvidia.com/nl-nl/consumer/graphics-cards/nvidia-geforce-rtx-5080/',
+        name: 'Nvidia RTX 5080 Founders Edition',
+      },
     ],
   },
 ];

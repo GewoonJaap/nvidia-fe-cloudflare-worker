@@ -4,11 +4,14 @@ import { sendToNtfy } from '../../ntfy/NTFYConnection';
 
 export class NvidiaApi {
   public async fetchInventory(store: NvidiaStore, env: Env): Promise<ListMap[]> {
+    console.log('Fetching inventory for store:', store);
     const results: ListMap[] = [];
 
     for (const productApi of store.productApiUrls) {
       const html = await this.fetchHtmlContent(productApi.consumerUrl);
+      console.log('Fetched HTML content:');
       const sku = this.extractSkuFromHtml(html);
+      console.log('Extracted SKU from HTML:', sku);
 
       const apiUrlWithSku = `${productApi.url}${sku}&locale=nl-nl`;
       const response = await fetch(apiUrlWithSku, {
@@ -31,7 +34,9 @@ export class NvidiaApi {
         throw new Error(`Failed to fetch data from ${apiUrlWithSku}`);
       }
       const data: ApiResponse = await response.json();
+      console.log('Fetched API response:', data);
       const purchasableProducts = this.filterPurchasableProducts(data.listMap);
+      console.log('Filtered purchasable products:', purchasableProducts);
 
       for (const product of purchasableProducts) {
         product.fe_sku = sku;

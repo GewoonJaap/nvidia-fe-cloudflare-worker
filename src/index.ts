@@ -32,7 +32,7 @@ app.get('/api/sku', async c => {
   const nvidiaApi = new NvidiaApi();
   const inventory = await nvidiaApi.fetchInventory(store, c.env as Env);
   const sku = inventory.length > 0 ? inventory[0].fe_sku : 'SKU not found';
-  return c.json({ inventory });
+  return c.json({ sku });
 });
 
 export default app;

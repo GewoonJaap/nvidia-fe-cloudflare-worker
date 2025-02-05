@@ -36,7 +36,7 @@ export class NvidiaApi {
       }
       const data: ApiResponse = await response.json();
       console.log('Fetched API response:', data);
-      const purchasableProducts = this.filterPurchasableProducts(data.listMap);
+      const purchasableProducts = data.listMap; //this.filterPurchasableProducts(data.listMap);
       console.log('Filtered purchasable products:', purchasableProducts);
 
       for (const product of purchasableProducts) {

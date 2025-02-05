@@ -1,7 +1,6 @@
 import { NvidiaStore } from '../../../types/ConstTypes';
 import { ApiResponse, ListMap } from '../../../types/NvidiaApiTypes';
 import { sendToNtfy } from '../../ntfy/NTFYConnection';
-import * as cheerio from 'cheerio';
 
 export class NvidiaApi {
   public async fetchInventory(store: NvidiaStore, env: Env): Promise<ListMap[]> {
@@ -73,15 +72,16 @@ export class NvidiaApi {
   }
 
   private extractSkuFromHtml(html: string): string {
-    const $ = cheerio.load(html);
-    const jsonLdScript = $('script[type="application/ld+json"]').html();
-    if (jsonLdScript) {
-      const jsonLd = JSON.parse(jsonLdScript);
-      const product = jsonLd.find((item: any) => item['@type'] === 'Product');
-      if (product && product.mpn) {
-        return product.mpn;
-      }
+    const mpnSplit = html.split('"mpn":"');
+    if (mpnSplit.length < 2) {
+      return 'SKU not found';
     }
-    return 'SKU not found';
+
+    const skuSplit = mpnSplit[1].split('"');
+    if (skuSplit.length < 2) {
+      return 'SKU not found';
+    }
+
+    return skuSplit[0];
   }
 }

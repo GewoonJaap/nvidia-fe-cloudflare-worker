@@ -1,7 +1,7 @@
 import { NvidiaStore } from '../../../types/ConstTypes';
 import { ApiResponse, ListMap } from '../../../types/NvidiaApiTypes';
 import { sendToNtfy } from '../../ntfy/NTFYConnection';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 
 export class NvidiaApi {
   public async fetchInventory(store: NvidiaStore, env: Env): Promise<ListMap[]> {

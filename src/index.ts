@@ -31,8 +31,7 @@ app.get('/api/sku', async c => {
   const store = NVIDIA_STORES[0]; // Assuming you want to fetch SKU for the first store
   const nvidiaApi = new NvidiaApi();
   const inventory = await nvidiaApi.fetchInventory(store, c.env as Env);
-  const sku = inventory.length > 0 ? inventory[0].fe_sku : 'SKU not found';
-  return c.json({ sku });
+  return c.json({ inventory });
 });
 
 export default app;

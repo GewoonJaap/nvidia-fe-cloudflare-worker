@@ -73,7 +73,7 @@ export class NvidiaApi {
   }
 
   private filterPurchasableProducts(products: ListMap[]): ListMap[] {
-    return products.filter(product => product.is_active != 'false');
+    return products.filter(product => product.is_active != 'false' || product.product_url);
   }
 
   private extractSkuFromHtml(html: string): string {

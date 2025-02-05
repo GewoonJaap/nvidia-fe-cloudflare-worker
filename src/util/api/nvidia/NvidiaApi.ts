@@ -1,6 +1,7 @@
 import { NvidiaStore } from '../../../types/ConstTypes';
 import { ApiResponse, ListMap } from '../../../types/NvidiaApiTypes';
 import { sendToNtfy } from '../../ntfy/NTFYConnection';
+import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
 
 export class NvidiaApi {
   public async fetchInventory(store: NvidiaStore, env: Env): Promise<ListMap[]> {
@@ -41,19 +42,14 @@ export class NvidiaApi {
       for (const product of purchasableProducts) {
         product.fe_sku = sku;
 
-        const kvKey = `${store.country}_${sku}`;
-        const previousStatus = await env.NVIDIA_FE_KV.get(kvKey);
-        const isInStock = product.is_active != 'false';
+        const previousStatus = await getStockStatus(env, sku);
+        const isInStock = product.is_active !== 'false';
 
         if (isInStock && previousStatus !== 'in_stock') {
           await sendToNtfy(product, store, productApi, env, true);
-          await env.NVIDIA_FE_KV.put(kvKey, 'in_stock');
-        } else if (!isInStock && previousStatus === 'in_stock') {
-          await env.NVIDIA_FE_KV.put(kvKey, 'out_of_stock');
-        } else if (isInStock && previousStatus === null) {
-          await sendToNtfy(product, store, productApi, env, true);
-          await env.NVIDIA_FE_KV.put(kvKey, 'in_stock');
         }
+
+        await saveStockStatus(env, sku, isInStock ? 'in_stock' : 'out_of_stock');
       }
 
       results.push(...purchasableProducts);

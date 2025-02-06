@@ -52,6 +52,15 @@ export class NvidiaApi {
         if (previousStatus !== (isInStock ? 'in_stock' : 'out_of_stock')) {
           await saveStockStatus(env, sku, isInStock ? 'in_stock' : 'out_of_stock');
         }
+
+        // Determine GPU series and send notification to series-specific topic
+        const gpuSeries = this.determineGpuSeries(productApi.name);
+        if (gpuSeries) {
+          const seriesTopic = env[`NTFY_TOPIC_${gpuSeries}`];
+          if (seriesTopic) {
+            await sendToNtfy(product, store, productApi, env, true);
+          }
+        }
       }
 
       results.push(...purchasableProducts);
@@ -99,5 +108,14 @@ export class NvidiaApi {
     }
 
     return skuSplit[0];
+  }
+
+  private determineGpuSeries(productName: string): string | null {
+    if (productName.includes('5080')) {
+      return '5080';
+    } else if (productName.includes('5090')) {
+      return '5090';
+    }
+    return null;
   }
 }

@@ -36,8 +36,6 @@ export class CoolblueApi {
     if (!response.ok) {
       throw new Error(`Failed to fetch HTML content from ${url}`);
     }
-    console.log('NTFY fetch result:', response);
-    console.log('NTFY fetch headers:', response.headers);
     return response.text();
   }
 

@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { NvidiaApi } from './util/api/nvidia/NvidiaApi';
-import { NVIDIA_STORES } from './util/const';
+import { CoolblueApi } from './util/api/coolblue/CoolblueApi';
+import { NVIDIA_STORES, COOLBLUE_PRODUCTS } from './util/const';
 
 const app = new Hono();
 
@@ -9,6 +10,10 @@ const app = new Hono();
   for (const store of NVIDIA_STORES) {
     const nvidiaApi = new NvidiaApi();
     await nvidiaApi.fetchInventory(store, env);
+  }
+  for (const product of COOLBLUE_PRODUCTS) {
+    const coolblueApi = new CoolblueApi();
+    await coolblueApi.fetchInventory(product.url, env);
   }
 };
 
@@ -26,6 +31,11 @@ app.get('/api/test', async c => {
     const nvidiaApi = new NvidiaApi();
     await nvidiaApi.fetchInventory(store, c.env as Env);
   }
+  for (const product of COOLBLUE_PRODUCTS) {
+    console.log('Processing product in /api/test route:', product);
+    const coolblueApi = new CoolblueApi();
+    await coolblueApi.fetchInventory(product.url, c.env as Env);
+  }
   return c.json({ message: 'Hello World!' });
 });
 
@@ -35,6 +45,15 @@ app.get('/api/sku', async c => {
   const nvidiaApi = new NvidiaApi();
   const inventory = await nvidiaApi.fetchInventory(store, c.env as Env);
   return c.json({ inventory });
+});
+
+app.get('/api/coolblue', async c => {
+  for (const product of COOLBLUE_PRODUCTS) {
+    console.log('Processing product in /api/coolblue route:', product);
+    const coolblueApi = new CoolblueApi();
+    await coolblueApi.fetchInventory(product.url, c.env as Env);
+  }
+  return c.json({ message: 'Coolblue products processed!' });
 });
 
 export default app;

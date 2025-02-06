@@ -8,3 +8,8 @@ export interface ProductApiUrl {
   name: string;
   consumerUrl: string;
 }
+
+export interface CoolblueProduct {
+  url: string;
+  name: string;
+}

@@ -76,14 +76,13 @@ export async function sendCoolblueNotification(productUrl: string, productName: 
 }
 
 async function postToNtfy(url: string, body: Record<string, unknown>, headers: Record<string, string>): Promise<void> {
-  console.log('Posting to NTFY:', url, body);
+  console.log('Posting to NTFY:', url, body, headers);
   const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(body),
     headers,
   });
   console.log('NTFY fetch result:', response);
-  console.log('NTFY fetch headers:', headers);
   if (response.ok) {
     const responseBody = await response.json();
     console.log('NTFY response body:', responseBody);

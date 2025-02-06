@@ -17,3 +17,18 @@ export const NVIDIA_STORES: NvidiaStore[] = [
     ],
   },
 ];
+
+export const COOLBLUE_PRODUCTS = [
+  {
+    url: 'https://www.coolblue.nl/product/959801?utm_medium=android-app&utm_source=referral&utm_campaign=product-share',
+    name: 'Coolblue Product 959801',
+  },
+  {
+    url: 'https://www.coolblue.nl/product/959802?utm_medium=android-app&utm_source=referral&utm_campaign=product-share',
+    name: 'Coolblue Product 959802',
+  },
+  {
+    url: 'https://www.coolblue.nl/product/959803?utm_medium=android-app&utm_source=referral&utm_campaign=product-share',
+    name: 'Coolblue Product 959803',
+  },
+];

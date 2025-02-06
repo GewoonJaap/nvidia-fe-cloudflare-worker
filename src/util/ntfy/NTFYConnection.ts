@@ -42,6 +42,16 @@ export async function sendToNtfy(
   };
 
   await postToNtfy(env.NTFY_URL, bodyObject, headers);
+
+  // Determine GPU series and send notification to series-specific topic
+  const gpuSeries = determineGpuSeries(productNvidia.name);
+  if (gpuSeries) {
+    const seriesTopic = env[`NTFY_TOPIC_${gpuSeries}`];
+    if (seriesTopic) {
+      bodyObject.topic = seriesTopic;
+      await postToNtfy(env.NTFY_URL, bodyObject, headers);
+    }
+  }
 }
 
 export async function sendCoolblueNotification(productUrl: string, productName: string, stockStatus: string, env: Env): Promise<void> {
@@ -73,6 +83,16 @@ export async function sendCoolblueNotification(productUrl: string, productName: 
   };
 
   await postToNtfy(env.NTFY_URL, bodyObject, headers);
+
+  // Determine GPU series and send notification to series-specific topic
+  const gpuSeries = determineGpuSeries(productName);
+  if (gpuSeries) {
+    const seriesTopic = env[`NTFY_TOPIC_${gpuSeries}`];
+    if (seriesTopic) {
+      bodyObject.topic = seriesTopic;
+      await postToNtfy(env.NTFY_URL, bodyObject, headers);
+    }
+  }
 }
 
 async function postToNtfy(url: string, body: Record<string, unknown>, headers: Record<string, string>): Promise<void> {
@@ -122,4 +142,13 @@ function getPriorityForProductNotification(
 ): string {
   // Add logic to determine priority if needed
   return notificationMessage.PRIORITY.name;
+}
+
+function determineGpuSeries(productName: string): string | null {
+  if (productName.includes('5080')) {
+    return '5080';
+  } else if (productName.includes('5090')) {
+    return '5090';
+  }
+  return null;
 }

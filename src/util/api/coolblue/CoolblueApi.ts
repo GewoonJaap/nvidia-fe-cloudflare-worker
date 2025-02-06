@@ -1,4 +1,4 @@
-import { sendToNtfy } from '../../ntfy/NTFYConnection';
+import { sendCoolblueNotification } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
 
 export class CoolblueApi {
@@ -8,7 +8,7 @@ export class CoolblueApi {
 
     const previousStatus = await getStockStatus(env, productUrl);
     if (stockStatus !== previousStatus) {
-      await sendToNtfy({ productUrl, stockStatus }, env);
+      await sendCoolblueNotification(productUrl, stockStatus, env);
       await saveStockStatus(env, productUrl, stockStatus);
     }
   }

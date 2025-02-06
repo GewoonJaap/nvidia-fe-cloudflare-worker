@@ -44,11 +44,7 @@ export async function sendToNtfy(
   await postToNtfy(env.NTFY_URL, bodyObject, headers);
 }
 
-export async function sendCoolblueNotification(
-  productUrl: string,
-  stockStatus: string,
-  env: Env
-): Promise<void> {
+export async function sendCoolblueNotification(productUrl: string, stockStatus: string, env: Env): Promise<void> {
   console.log('Sending notification to NTFY for Coolblue product:', productUrl);
   const notificationMessage = getCoolblueTemplateString(stockStatus);
   const bodyObject = {

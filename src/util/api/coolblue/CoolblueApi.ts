@@ -1,5 +1,6 @@
 import { sendCoolblueNotification } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
+import { COOLBLUE_PRODUCTS } from '../../const';
 
 export class CoolblueApi {
   public async fetchInventory(productUrl: string, env: Env): Promise<void> {
@@ -8,7 +9,9 @@ export class CoolblueApi {
 
     const previousStatus = await getStockStatus(env, productUrl);
     if (stockStatus !== previousStatus) {
-      await sendCoolblueNotification(productUrl, stockStatus, env);
+      const product = COOLBLUE_PRODUCTS.find(p => p.url === productUrl);
+      const productName = product ? product.name : 'Unknown Product';
+      await sendCoolblueNotification(productUrl, productName, stockStatus, env);
       await saveStockStatus(env, productUrl, stockStatus);
     }
   }

@@ -8,7 +8,6 @@ If you'd like to use this setup, follow the steps below:
    - **Topic Name:** nvidia-fe
    - **Server Address:** https://ntfy.mrproper.dev
 
-
 ```
 npm install
 npm run dev

@@ -44,13 +44,13 @@ export async function sendToNtfy(
   await postToNtfy(env.NTFY_URL, bodyObject, headers);
 }
 
-export async function sendCoolblueNotification(productUrl: string, stockStatus: string, env: Env): Promise<void> {
-  console.log('Sending notification to NTFY for Coolblue product:', productUrl);
+export async function sendCoolblueNotification(productUrl: string, productName: string, stockStatus: string, env: Env): Promise<void> {
+  console.log('Sending notification to NTFY for Coolblue product:', productName);
   const notificationMessage = getCoolblueTemplateString(stockStatus);
   const bodyObject = {
     topic: env.NTFY_TOPIC,
     message: renderTemplateString(notificationMessage.MESSAGE, {
-      PRODUCT_URL: productUrl,
+      PRODUCT_NAME: productName,
       STOCK_STATUS: stockStatus,
     }),
     actions: [
@@ -64,7 +64,7 @@ export async function sendCoolblueNotification(productUrl: string, stockStatus: 
 
   const headers = {
     Title: renderTemplateString(notificationMessage.MESSAGE, {
-      PRODUCT_URL: productUrl,
+      PRODUCT_NAME: productName,
       STOCK_STATUS: stockStatus,
     }),
     Priority: notificationMessage.PRIORITY.name,
@@ -102,11 +102,11 @@ function getTemplateString(product: ListMap, firstTimeSeen: boolean): { MESSAGE:
 
 function getCoolblueTemplateString(stockStatus: string): { MESSAGE: string; PRIORITY: { name: string; rank: number } } {
   if (stockStatus === 'on_stock') {
-    return { MESSAGE: 'Coolblue product is now in stock {{PRODUCT_URL}}', PRIORITY: { name: 'high', rank: 1 } };
+    return { MESSAGE: 'Coolblue product is now in stock {{PRODUCT_NAME}}', PRIORITY: { name: 'high', rank: 1 } };
   } else if (stockStatus === 'available_soon') {
-    return { MESSAGE: 'Coolblue product will be available soon {{PRODUCT_URL}}', PRIORITY: { name: 'medium', rank: 2 } };
+    return { MESSAGE: 'Coolblue product will be available soon {{PRODUCT_NAME}}', PRIORITY: { name: 'medium', rank: 2 } };
   }
-  return { MESSAGE: 'Coolblue product is out of stock {{PRODUCT_URL}}', PRIORITY: { name: 'low', rank: 3 } };
+  return { MESSAGE: 'Coolblue product is out of stock {{PRODUCT_NAME}}', PRIORITY: { name: 'low', rank: 3 } };
 }
 
 function getPriorityForProductNotification(

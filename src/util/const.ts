@@ -21,14 +21,14 @@ export const NVIDIA_STORES: NvidiaStore[] = [
 export const COOLBLUE_PRODUCTS = [
   {
     url: 'https://www.coolblue.nl/product/959801?utm_medium=android-app&utm_source=referral&utm_campaign=product-share',
-    name: 'Coolblue Product 959801',
+    name: 'MSI GeForce RTX 5090 SUPRIM SOC 32GB',
   },
   {
     url: 'https://www.coolblue.nl/product/959802?utm_medium=android-app&utm_source=referral&utm_campaign=product-share',
-    name: 'Coolblue Product 959802',
+    name: 'MSI GeForce RTX 5090 GAMING TRIO OC 32GB',
   },
   {
     url: 'https://www.coolblue.nl/product/959803?utm_medium=android-app&utm_source=referral&utm_campaign=product-share',
-    name: 'Coolblue Product 959803',
+    name: 'MSI GeForce RTX 5090 VENTUS 3X OC 32GB',
   },
 ];

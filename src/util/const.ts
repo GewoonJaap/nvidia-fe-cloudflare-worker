@@ -44,23 +44,23 @@ export const COOLBLUE_PRODUCTS = [
 export const BOL_PRODUCTS = [
   {
     url: 'https://www.bol.com/nl/nl/p/msi-nvidia-geforce-rtx-5090-32g-gaming-trio-oc-videokaart-32gb-gddr7-pcie-5-0-1x-hdmi-2-1b-3x-displayport-2-1a/9300000222902218/?bltgh=fa83d7e9-c9aa-4105-b101-43cc316c0b14.wishlist_details_page_products.WishlistDetailProductCardItem_4.ProductTitle',
-    name: 'MSI - NVIDIA GeForce RTX 5090 32G GAMING TRIO OC - Videokaart - 32GB - GDDR7 - PCIe 5.0 - 1x HDMI 2.1b - 3x DisplayPort 2.1a',
+    name: 'MSI - NVIDIA GeForce RTX 5090 32G GAMING TRIO OC',
   },
   {
     url: 'https://www.bol.com/nl/nl/p/msi-nvidia-geforce-rtx-5090-32g-suprim-liquid-soc-videokaart-32gb-gddr7-pcie-5-0-1x-hdmi-2-1b-3x-displayport-2-1a/9300000222902221/?bltgh=fa83d7e9-c9aa-4105-b101-43cc316c0b14.wishlist_details_page_products.WishlistDetailProductCardItem_3.ProductTitle',
-    name: 'MSI - NVIDIA GeForce RTX 5090 32G SUPRIM LIQUID SOC - Videokaart - 32GB - GDDR7 - PCIe 5.0 - 1x HDMI 2.1b - 3x DisplayPort 2.1a',
+    name: 'MSI - NVIDIA GeForce RTX 5090 32G SUPRIM LIQUID SOC',
   },
   {
     url: 'https://www.bol.com/nl/nl/p/msi-ventus-geforce-rtx-5090-32g-3x-oc-videokaart-nvidia-32-gb-gddr7/9300000222902226/?bltgh=fa83d7e9-c9aa-4105-b101-43cc316c0b14.wishlist_details_page_products.WishlistDetailProductCardItem_2.ProductTitle',
-    name: 'MSI VENTUS GEFORCE RTX 5090 32G 3X OC videokaart NVIDIA 32 GB GDDR7',
+    name: 'MSI VENTUS GEFORCE RTX 5090 32G 3X OC',
   },
   {
     url: 'https://www.bol.com/nl/nl/p/gigabyte-geforce-rtx-5090-windforce-oc-32g-nvidia-32-gb-gddr7/9300000224382653/?bltgh=fa83d7e9-c9aa-4105-b101-43cc316c0b14.wishlist_details_page_products.WishlistDetailProductCardItem_1.ProductTitle',
-    name: 'GIGABYTE GeForce RTX 5090 WINDFORCE OC 32G NVIDIA 32 GB GDDR7',
+    name: 'GIGABYTE GeForce RTX 5090 WINDFORCE OC',
   },
   {
     url: 'https://www.bol.com/nl/nl/p/pny-geforce-rtx-5090-oc-nvidia-32-gb-gddr7/9300000224383133/?bltgh=fa83d7e9-c9aa-4105-b101-43cc316c0b14.wishlist_details_page_products.WishlistDetailProductCardItem_0.ProductTitle',
-    name: 'PNY GeForce RTX 5090 OC NVIDIA 32 GB GDDR7',
+    name: 'PNY GeForce RTX 5090',
   },
 ];
 

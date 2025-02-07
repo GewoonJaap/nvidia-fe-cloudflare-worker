@@ -141,7 +141,13 @@ export async function sendBolNotification(productUrl: string, productName: strin
   }
 }
 
-export async function sendAlternateNotification(productUrl: string, productName: string, stockStatus: string, env: Env, imageUrl?: string): Promise<void> {
+export async function sendAlternateNotification(
+  productUrl: string,
+  productName: string,
+  stockStatus: string,
+  env: Env,
+  imageUrl?: string
+): Promise<void> {
   console.log('Sending notification to NTFY for Alternate product:', productName);
   const notificationMessage = getAlternateTemplateString(stockStatus);
   const bodyObject = {

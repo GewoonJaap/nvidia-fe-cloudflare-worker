@@ -42,7 +42,7 @@ export class BolApi {
   private extractStockStatusFromHtml(html: string): string {
     const ldJsonSplit = html.split('<script type="application/ld+json">');
     if (ldJsonSplit.length < 2) {
-      return 'stock_status not found';
+      return 'OutOfStock';
     }
 
     const ldJson = ldJsonSplit[1].split('</script>')[0];

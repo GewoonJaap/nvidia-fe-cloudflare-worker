@@ -53,7 +53,8 @@ export class AlternateApi {
     }
 
     const ldJson = ldJsonSplit[1].split('</script>')[0];
-    const productData = JSON.parse(ldJson);
+    const productDatas = JSON.parse(ldJson);
+    const productData = productDatas[0];
 
     const price = productData.offers.price || 'N/A';
     const image = productData.image || '';

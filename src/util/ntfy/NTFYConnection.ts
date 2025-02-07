@@ -242,9 +242,9 @@ function getBolTemplateString(stockStatus: string): { MESSAGE: string; PRIORITY:
 
 function getAlternateTemplateString(stockStatus: string): { MESSAGE: string; PRIORITY: { name: string; rank: number } } {
   if (stockStatus === 'InStock') {
-    return { MESSAGE: 'Alternate product is now in stock {{PRODUCT_NAME}}', PRIORITY: { name: 'max', rank: 1 } };
+    return { MESSAGE: 'Alternate.DE product is now in stock {{PRODUCT_NAME}}', PRIORITY: { name: 'max', rank: 1 } };
   }
-  return { MESSAGE: 'Alternate product is out of stock {{PRODUCT_NAME}}', PRIORITY: { name: 'low', rank: 3 } };
+  return { MESSAGE: 'Alternate.DE product is out of stock {{PRODUCT_NAME}}', PRIORITY: { name: 'low', rank: 3 } };
 }
 
 function getPriorityForProductNotification(

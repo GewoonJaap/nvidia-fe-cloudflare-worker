@@ -7,7 +7,8 @@ export async function sendToNtfy(
   store: NvidiaStore,
   productNvidia: ProductApiUrl,
   env: Env,
-  firstTimeSeen: boolean = true
+  firstTimeSeen: boolean = true,
+  imageUrl?: string
 ): Promise<void> {
   console.log('Sending notification to NTFY for product:', product.fe_sku);
   const notificationMessage = getTemplateString(product, firstTimeSeen);
@@ -31,7 +32,7 @@ export async function sendToNtfy(
     ],
   };
 
-  const headers = {
+  const headers: Record<string, string> = {
     Title: renderTemplateString(notificationMessage.MESSAGE, {
       PRODUCT_TITLE: productNvidia.name,
       STORE_NAME: store.country,
@@ -40,6 +41,10 @@ export async function sendToNtfy(
     Tags: getTags(store, product, productNvidia),
     Authorization: 'Bearer ' + env.NTFY_BEARER,
   };
+
+  if (imageUrl) {
+    headers.Attach = imageUrl;
+  }
 
   await postToNtfy(env.NTFY_URL, bodyObject, headers);
 
@@ -136,6 +141,51 @@ export async function sendBolNotification(productUrl: string, productName: strin
   }
 }
 
+export async function sendAlternateNotification(productUrl: string, productName: string, stockStatus: string, env: Env, imageUrl?: string): Promise<void> {
+  console.log('Sending notification to NTFY for Alternate product:', productName);
+  const notificationMessage = getAlternateTemplateString(stockStatus);
+  const bodyObject = {
+    topic: env.NTFY_TOPIC,
+    message: renderTemplateString(notificationMessage.MESSAGE, {
+      PRODUCT_NAME: productName,
+      STOCK_STATUS: stockStatus,
+    }),
+    actions: [
+      {
+        action: 'view',
+        label: 'View Product',
+        url: productUrl,
+      },
+    ],
+  };
+
+  const headers: Record<string, string> = {
+    Title: renderTemplateString(notificationMessage.MESSAGE, {
+      PRODUCT_NAME: productName,
+      STOCK_STATUS: stockStatus,
+    }),
+    Priority: notificationMessage.PRIORITY.name,
+    Tags: `alternate,${stockStatus}`,
+    Authorization: 'Bearer ' + env.NTFY_BEARER,
+  };
+
+  if (imageUrl) {
+    headers.Attach = imageUrl;
+  }
+
+  await postToNtfy(env.NTFY_URL, bodyObject, headers);
+
+  // Determine GPU series and send notification to series-specific topic
+  const gpuSeries = determineGpuSeries(productName);
+  if (gpuSeries) {
+    const seriesTopic = env[`NTFY_TOPIC_${gpuSeries}`];
+    if (seriesTopic) {
+      bodyObject.topic = seriesTopic;
+      await postToNtfy(env.NTFY_URL, bodyObject, headers);
+    }
+  }
+}
+
 async function postToNtfy(url: string, body: Record<string, unknown>, headers: Record<string, string>): Promise<void> {
   console.log('Posting to NTFY:', url, body, headers);
   const response = await fetch(url, {
@@ -182,6 +232,13 @@ function getBolTemplateString(stockStatus: string): { MESSAGE: string; PRIORITY:
     return { MESSAGE: 'Bol.com product is now in stock {{PRODUCT_NAME}}', PRIORITY: { name: 'max', rank: 1 } };
   }
   return { MESSAGE: 'Bol.com product is out of stock {{PRODUCT_NAME}}', PRIORITY: { name: 'low', rank: 3 } };
+}
+
+function getAlternateTemplateString(stockStatus: string): { MESSAGE: string; PRIORITY: { name: string; rank: number } } {
+  if (stockStatus === 'InStock') {
+    return { MESSAGE: 'Alternate product is now in stock {{PRODUCT_NAME}}', PRIORITY: { name: 'max', rank: 1 } };
+  }
+  return { MESSAGE: 'Alternate product is out of stock {{PRODUCT_NAME}}', PRIORITY: { name: 'low', rank: 3 } };
 }
 
 function getPriorityForProductNotification(

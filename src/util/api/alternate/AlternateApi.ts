@@ -54,6 +54,7 @@ export class AlternateApi {
 
     const ldJson = ldJsonSplit[1].split('</script>')[0];
     const productDatas = JSON.parse(ldJson);
+    console.log('alternate', productDatas[0]);
     const productData = productDatas[0];
 
     const price = productData.offers.price || 'N/A';

@@ -77,6 +77,30 @@ export const ALTERNATE_STORE = [
     url: 'https://www.alternate.de/GIGABYTE/GeForce-RTX-5090-AORUS-MASTER-32G-Grafikkarte/html/product/100108932',
     name: 'GIGABYTE GeForce RTX 5090 AORUS MASTER 32G',
   },
+  {
+    url: 'https://www.alternate.de/ZOTAC/GeForce-RTX-5090-SOLID-Grafikkarte/html/product/100110077',
+    name: 'ZOTAC GeForce RTX 5090 SOLID',
+  },
+  {
+    url: 'https://www.alternate.de/ZOTAC/GeForce-RTX-5090-SOLID-OC-Grafikkarte/html/product/100110079',
+    name: 'ZOTAC GeForce RTX 5090 SOLID OC',
+  },
+  {
+    url: 'https://www.alternate.de/GIGABYTE/GeForce-RTX-5090-WINDFORCE-OC-32G-Grafikkarte/html/product/100108938',
+    name: 'GIGABYTE GeForce RTX 5090 WINDFORCE OC 32G',
+  },
+  {
+    url: 'https://www.alternate.de/ZOTAC/GeForce-RTX-5090-AMP-Extreme-INFINITY-Grafikkarte/html/product/100110080',
+    name: 'GeForce RTX 5090 AMP Extreme INFINITY',
+  },
+  {
+    url: 'https://www.alternate.de/ASUS/GeForce-RTX-5090-TUF-GAMING-Grafikkarte/html/product/100110148',
+    name: 'ASUS GeForce RTX 5090 TUF GAMING',
+  },
+  {
+    url: 'https://www.alternate.de/ASUS/GeForce-RTX-5090-TUF-GAMING-OC-Grafikkarte/html/product/100110147',
+    name: 'ASUS GeForce RTX 5090 TUF GAMING OC',
+  },
 ];
 
 export const GPU_SERIES = {

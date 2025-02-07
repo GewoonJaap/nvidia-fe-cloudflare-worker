@@ -11,9 +11,10 @@ If you'd like to use this setup, follow the steps below:
      - `nvidia-fe-5090` → Notifications for Nvidia 5090 (Nvidia, Coolblue, Bol.com)
      - `nvidia-fe-5080` → Notifications for Nvidia 5080 (Nvidia, Coolblue, Bol.com)
 
-This setup will allow you to receive real-time notifications related to Nvidia FE availability. 
+This setup will allow you to receive real-time notifications related to Nvidia FE availability.
 
 ## Development
+
 ```
 npm install
 npm run dev

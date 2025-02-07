@@ -228,7 +228,7 @@ function getCoolblueTemplateString(stockStatus: string): { MESSAGE: string; PRIO
   if (stockStatus === 'on_stock') {
     return { MESSAGE: 'Coolblue product is now in stock {{PRODUCT_NAME}}', PRIORITY: { name: 'max', rank: 1 } };
   } else if (stockStatus === 'available_soon') {
-    return { MESSAGE: 'Coolblue product will be available soon {{PRODUCT_NAME}}', PRIORITY: { name: 'default', rank: 2 } };
+    return { MESSAGE: 'Coolblue product will be available soon {{PRODUCT_NAME}}', PRIORITY: { name: 'low', rank: 2 } };
   }
   return { MESSAGE: 'Coolblue product is out of stock {{PRODUCT_NAME}}', PRIORITY: { name: 'low', rank: 3 } };
 }

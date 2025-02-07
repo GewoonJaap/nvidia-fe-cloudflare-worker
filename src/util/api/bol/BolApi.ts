@@ -49,9 +49,9 @@ export class BolApi {
     const productData = JSON.parse(ldJson);
 
     if (productData.hasVariant && Array.isArray(productData.hasVariant) && productData.hasVariant.length > 0) {
-      return productData.hasVariant[0].offers.availability || 'stock_status not found';
+      return productData.hasVariant[0].offers.availability || 'OutOfStock';
     }
 
-    return productData.offers.availability || 'stock_status not found';
+    return productData.offers.availability || 'OutOfStock';
   }
 }

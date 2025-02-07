@@ -70,6 +70,10 @@ export const BOL_PRODUCTS = [
     url: 'https://www.bol.com/nl/nl/p/msi-nvidia-geforce-rtx-5080-16g-ventus-3x-oc-videokaart-16gb-gddr7-pcie-5-0-1x-hdmi-2-1b-3x-displayport-2-1a/9300000222902227/?bltgh=u3E1zM-Zzys8R5TGxlhIWw.twlOJS0pcVOjdev1Cn5BMg_0_16.42.ProductTitle',
     name: 'MSI GeForce RTX 5080 16G VENTUS',
   },
+  {
+    url: 'https://www.bol.com/nl/nl/p/geforce-rtx-5090-32g-suprim-soc/9300000222902224/?bltgh=hcwkFIRBhrt6cTzWHzRCHA.rXFS2igOoZh0hoM7YQFA3w_0_16.19.ProductImage',
+    name: 'MSI GeForce RTX 5090 Suprim SOC',
+  },
 ];
 
 export const ALTERNATE_STORE = [

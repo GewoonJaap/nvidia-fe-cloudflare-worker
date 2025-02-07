@@ -62,6 +62,14 @@ export const BOL_PRODUCTS = [
     url: 'https://www.bol.com/nl/nl/p/pny-geforce-rtx-5090-oc-nvidia-32-gb-gddr7/9300000224383133/?bltgh=fa83d7e9-c9aa-4105-b101-43cc316c0b14.wishlist_details_page_products.WishlistDetailProductCardItem_0.ProductTitle',
     name: 'PNY GeForce RTX 5090',
   },
+  {
+    url: 'https://www.bol.com/nl/nl/p/asus-rog-astral-rtx5090-o32g-gaming-nvidia-geforce-rtx-5090-32-gb-gddr7/9300000224382989/?referrer=socialshare_pdp_iphoneapp',
+    name: 'ASUS ROG Astral - -RTX5090',
+  },
+  {
+    url: 'https://www.bol.com/nl/nl/p/msi-nvidia-geforce-rtx-5080-16g-ventus-3x-oc-videokaart-16gb-gddr7-pcie-5-0-1x-hdmi-2-1b-3x-displayport-2-1a/9300000222902227/?bltgh=u3E1zM-Zzys8R5TGxlhIWw.twlOJS0pcVOjdev1Cn5BMg_0_16.42.ProductTitle',
+    name: 'MSI GeForce RTX 5080 16G VENTUS',
+  },
 ];
 
 export const GPU_SERIES = {

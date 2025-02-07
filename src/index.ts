@@ -2,7 +2,8 @@ import { Hono } from 'hono';
 import { NvidiaApi } from './util/api/nvidia/NvidiaApi';
 import { CoolblueApi } from './util/api/coolblue/CoolblueApi';
 import { BolApi } from './util/api/bol/BolApi';
-import { NVIDIA_STORES, COOLBLUE_PRODUCTS, BOL_PRODUCTS } from './util/const';
+import { AlternateApi } from './util/api/alternate/AlternateApi';
+import { NVIDIA_STORES, COOLBLUE_PRODUCTS, BOL_PRODUCTS, ALTERNATE_STORE } from './util/const';
 
 const app = new Hono();
 
@@ -19,6 +20,10 @@ const app = new Hono();
   for (const product of BOL_PRODUCTS) {
     const bolApi = new BolApi();
     await bolApi.fetchInventory(product.url, env);
+  }
+  for (const product of ALTERNATE_STORE) {
+    const alternateApi = new AlternateApi();
+    await alternateApi.fetchInventory(product.url, env);
   }
 };
 
@@ -45,6 +50,11 @@ app.get('/api/test', async c => {
     console.log('Processing product in /api/test route:', product);
     const bolApi = new BolApi();
     await bolApi.fetchInventory(product.url, c.env as Env);
+  }
+  for (const product of ALTERNATE_STORE) {
+    console.log('Processing product in /api/test route:', product);
+    const alternateApi = new AlternateApi();
+    await alternateApi.fetchInventory(product.url, c.env as Env);
   }
   return c.json({ message: 'Hello World!' });
 });
@@ -73,6 +83,15 @@ app.get('/api/bol', async c => {
     await bolApi.fetchInventory(product.url, c.env as Env);
   }
   return c.json({ message: 'Bol.com products processed!' });
+});
+
+app.get('/api/alternate', async c => {
+  for (const product of ALTERNATE_STORE) {
+    console.log('Processing product in /api/alternate route:', product);
+    const alternateApi = new AlternateApi();
+    await alternateApi.fetchInventory(product.url, c.env as Env);
+  }
+  return c.json({ message: 'Alternate products processed!' });
 });
 
 export default app;

@@ -72,6 +72,13 @@ export const BOL_PRODUCTS = [
   },
 ];
 
+export const ALTERNATE_STORE = [
+  {
+    url: 'https://www.alternate.de/GIGABYTE/GeForce-RTX-5090-AORUS-MASTER-32G-Grafikkarte/html/product/100108932',
+    name: 'GIGABYTE GeForce RTX 5090 AORUS MASTER 32G',
+  },
+];
+
 export const GPU_SERIES = {
   '5080': '5080',
   '5090': '5090',

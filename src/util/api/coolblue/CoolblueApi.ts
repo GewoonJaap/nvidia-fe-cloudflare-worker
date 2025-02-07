@@ -8,7 +8,7 @@ export class CoolblueApi {
     const stockStatus = this.extractStockStatusFromHtml(html);
 
     const previousStatus = await getStockStatus(env, productUrl);
-    if (stockStatus !== previousStatus) {
+    if (stockStatus === 'in_stock' && stockStatus !== previousStatus) {
       const product = COOLBLUE_PRODUCTS.find(p => p.url === productUrl);
       const productName = product ? product.name : 'Unknown Product';
       await sendCoolblueNotification(productUrl, productName, stockStatus, env);

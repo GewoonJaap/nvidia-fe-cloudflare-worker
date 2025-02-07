@@ -8,7 +8,7 @@ export class BolApi {
     const stockStatus = this.extractStockStatusFromHtml(html);
 
     const previousStatus = await getStockStatus(env, productUrl);
-    if (stockStatus !== previousStatus) {
+    if (stockStatus === 'InStock' && stockStatus !== previousStatus) {
       const product = BOL_PRODUCTS.find(p => p.url === productUrl);
       const productName = product ? product.name : 'Unknown Product';
       await sendBolNotification(productUrl, productName, stockStatus, env);

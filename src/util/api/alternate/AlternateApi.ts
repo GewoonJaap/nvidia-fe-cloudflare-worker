@@ -15,7 +15,7 @@ export class AlternateApi {
     const { price, image, availability } = productData;
     const previousStatus = await getStockStatus(env, productUrl);
 
-    if (availability !== previousStatus) {
+    if (availability === 'InStock' && availability !== previousStatus) {
       const product = ALTERNATE_STORE.find(p => p.url === productUrl);
       const productName = product ? product.name : 'Unknown Product';
       await sendAlternateNotification(productUrl, productName, availability, env, image);

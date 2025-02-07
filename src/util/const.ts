@@ -39,6 +39,10 @@ export const COOLBLUE_PRODUCTS = [
     url: 'https://www.coolblue.nl/product/959793?utm_medium=android-app&utm_source=referral&utm_campaign=product-share',
     name: 'MSI GeForce RTX 5080 SUPRIM SOC',
   },
+  {
+    url: 'https://www.bol.com/nl/nl/p/geforce-rtx-5090-32g-suprim-soc/9300000222902224/?bltgh=hcwkFIRBhrt6cTzWHzRCHA.rXFS2igOoZh0hoM7YQFA3w_0_16.19.ProductImage',
+    name: 'MSI GeForce RTX 5090 Suprim SOC',
+  },
 ];
 
 export const BOL_PRODUCTS = [

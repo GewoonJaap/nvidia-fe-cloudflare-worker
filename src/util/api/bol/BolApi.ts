@@ -1,4 +1,4 @@
-import { sendCoolblueNotification } from '../../ntfy/NTFYConnection';
+import { sendBolNotification } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
 import { BOL_PRODUCTS } from '../../const';
 
@@ -11,7 +11,7 @@ export class BolApi {
     if (stockStatus !== previousStatus) {
       const product = BOL_PRODUCTS.find(p => p.url === productUrl);
       const productName = product ? product.name : 'Unknown Product';
-      await sendCoolblueNotification(productUrl, productName, stockStatus, env);
+      await sendBolNotification(productUrl, productName, stockStatus, env);
       await saveStockStatus(env, productUrl, stockStatus);
     }
   }

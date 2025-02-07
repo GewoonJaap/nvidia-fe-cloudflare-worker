@@ -95,6 +95,47 @@ export async function sendCoolblueNotification(productUrl: string, productName: 
   }
 }
 
+export async function sendBolNotification(productUrl: string, productName: string, stockStatus: string, env: Env): Promise<void> {
+  console.log('Sending notification to NTFY for Bol.com product:', productName);
+  const notificationMessage = getBolTemplateString(stockStatus);
+  const bodyObject = {
+    topic: env.NTFY_TOPIC,
+    message: renderTemplateString(notificationMessage.MESSAGE, {
+      PRODUCT_NAME: productName,
+      STOCK_STATUS: stockStatus,
+    }),
+    actions: [
+      {
+        action: 'view',
+        label: 'View Product',
+        url: productUrl,
+      },
+    ],
+  };
+
+  const headers = {
+    Title: renderTemplateString(notificationMessage.MESSAGE, {
+      PRODUCT_NAME: productName,
+      STOCK_STATUS: stockStatus,
+    }),
+    Priority: notificationMessage.PRIORITY.name,
+    Tags: `bol,${stockStatus}`,
+    Authorization: 'Bearer ' + env.NTFY_BEARER,
+  };
+
+  await postToNtfy(env.NTFY_URL, bodyObject, headers);
+
+  // Determine GPU series and send notification to series-specific topic
+  const gpuSeries = determineGpuSeries(productName);
+  if (gpuSeries) {
+    const seriesTopic = env[`NTFY_TOPIC_${gpuSeries}`];
+    if (seriesTopic) {
+      bodyObject.topic = seriesTopic;
+      await postToNtfy(env.NTFY_URL, bodyObject, headers);
+    }
+  }
+}
+
 async function postToNtfy(url: string, body: Record<string, unknown>, headers: Record<string, string>): Promise<void> {
   console.log('Posting to NTFY:', url, body, headers);
   const response = await fetch(url, {
@@ -134,6 +175,13 @@ function getCoolblueTemplateString(stockStatus: string): { MESSAGE: string; PRIO
     return { MESSAGE: 'Coolblue product will be available soon {{PRODUCT_NAME}}', PRIORITY: { name: 'default', rank: 2 } };
   }
   return { MESSAGE: 'Coolblue product is out of stock {{PRODUCT_NAME}}', PRIORITY: { name: 'low', rank: 3 } };
+}
+
+function getBolTemplateString(stockStatus: string): { MESSAGE: string; PRIORITY: { name: string; rank: number } } {
+  if (stockStatus === 'InStock') {
+    return { MESSAGE: 'Bol.com product is now in stock {{PRODUCT_NAME}}', PRIORITY: { name: 'max', rank: 1 } };
+  }
+  return { MESSAGE: 'Bol.com product is out of stock {{PRODUCT_NAME}}', PRIORITY: { name: 'low', rank: 3 } };
 }
 
 function getPriorityForProductNotification(

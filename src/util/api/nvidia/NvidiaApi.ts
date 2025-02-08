@@ -48,14 +48,7 @@ export class NvidiaApi {
           const previousStatus = await getStockStatus(env, sku);
           if (previousStatus !== 'in_stock') {
             await sendToNtfy(product, store, productApi, env, true);
-          }
-          if (previousStatus !== 'in_stock') {
             await saveStockStatus(env, sku, 'in_stock');
-          }
-        } else {
-          const previousStatus = await getStockStatus(env, sku);
-          if (previousStatus !== 'out_of_stock') {
-            await saveStockStatus(env, sku, 'out_of_stock');
           }
         }
       }

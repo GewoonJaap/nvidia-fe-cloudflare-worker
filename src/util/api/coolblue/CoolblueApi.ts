@@ -7,12 +7,14 @@ export class CoolblueApi {
     const html = await this.fetchHtmlContent(productUrl);
     const stockStatus = this.extractStockStatusFromHtml(html);
 
-    const previousStatus = await getStockStatus(env, productUrl);
-    if (stockStatus === 'on_stock' && stockStatus !== previousStatus) {
-      const product = COOLBLUE_PRODUCTS.find(p => p.url === productUrl);
-      const productName = product ? product.name : 'Unknown Product';
-      await sendCoolblueNotification(productUrl, productName, stockStatus, env);
-      await saveStockStatus(env, productUrl, stockStatus);
+    if (stockStatus === 'on_stock') {
+      const previousStatus = await getStockStatus(env, productUrl);
+      if (stockStatus !== previousStatus) {
+        const product = COOLBLUE_PRODUCTS.find(p => p.url === productUrl);
+        const productName = product ? product.name : 'Unknown Product';
+        await sendCoolblueNotification(productUrl, productName, stockStatus, env);
+        await saveStockStatus(env, productUrl, stockStatus);
+      }
     }
   }
 

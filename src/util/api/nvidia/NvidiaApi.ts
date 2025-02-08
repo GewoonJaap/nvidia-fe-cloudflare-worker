@@ -42,15 +42,21 @@ export class NvidiaApi {
       for (const product of purchasableProducts) {
         product.fe_sku = sku;
 
-        const previousStatus = await getStockStatus(env, sku);
         const isInStock = product.is_active !== 'false';
 
-        if (isInStock && previousStatus !== 'in_stock') {
-          await sendToNtfy(product, store, productApi, env, true);
-        }
-
-        if (previousStatus !== (isInStock ? 'in_stock' : 'out_of_stock')) {
-          await saveStockStatus(env, sku, isInStock ? 'in_stock' : 'out_of_stock');
+        if (isInStock) {
+          const previousStatus = await getStockStatus(env, sku);
+          if (previousStatus !== 'in_stock') {
+            await sendToNtfy(product, store, productApi, env, true);
+          }
+          if (previousStatus !== 'in_stock') {
+            await saveStockStatus(env, sku, 'in_stock');
+          }
+        } else {
+          const previousStatus = await getStockStatus(env, sku);
+          if (previousStatus !== 'out_of_stock') {
+            await saveStockStatus(env, sku, 'out_of_stock');
+          }
         }
       }
 

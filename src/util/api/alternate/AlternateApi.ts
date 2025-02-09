@@ -43,6 +43,7 @@ export class AlternateApi implements StockApi {
         env: this.env,
         imageUrl: image,
         storeName: 'Alternate',
+        price: price,
       });
     }
     this.stockStatus[productUrl] = availability;

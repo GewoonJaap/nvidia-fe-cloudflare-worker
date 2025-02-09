@@ -30,7 +30,7 @@ export class CoolblueApi implements StockApi {
       return;
     }
 
-    const { availability, image } = productData;
+    const { availability, image, price } = productData;
     const previousStatus = this.stockStatus[productUrl];
 
     console.log(`Fetched status for: ${productUrl}:`, availability, 'Previous status:', previousStatus);
@@ -45,6 +45,7 @@ export class CoolblueApi implements StockApi {
         env: this.env,
         storeName: 'Coolblue',
         imageUrl: image,
+        price,
       });
     }
     this.stockStatus[productUrl] = availability;
@@ -77,7 +78,7 @@ export class CoolblueApi implements StockApi {
     return response.text();
   }
 
-  private extractProductDataFromHtml(html: string): { availability: string; image?: string } | null {
+  private extractProductDataFromHtml(html: string): { availability: string; image?: string; price?: string } | null {
     const ldJsonSplit = html.split('<script type="application/ld+json">');
     if (ldJsonSplit.length < 2) {
       return null;
@@ -88,7 +89,8 @@ export class CoolblueApi implements StockApi {
 
     const availability = productData.offers.availability.split('/').pop() || 'OutOfStock';
     const image = productData.image || undefined;
+    const price = productData.offers.price || undefined;
 
-    return { availability, image };
+    return { availability, image, price };
   }
 }

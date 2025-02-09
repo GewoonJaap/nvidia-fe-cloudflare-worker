@@ -9,7 +9,8 @@ export async function sendNotification(payload: NotificationPayload): Promise<vo
     message: renderTemplateString(notificationMessage.MESSAGE, {
       PRODUCT_NAME: payload.productName,
       STOCK_STATUS: payload.stockStatus,
-      STORE_NAME: payload.storeName || '',
+      STORE_NAME: payload.storeName || 'Unknown store',
+      PRICE: payload.price || 'Unknown price',
     }),
     actions: [
       {
@@ -25,7 +26,8 @@ export async function sendNotification(payload: NotificationPayload): Promise<vo
     Title: renderTemplateString(notificationMessage.MESSAGE, {
       PRODUCT_NAME: payload.productName,
       STOCK_STATUS: payload.stockStatus,
-      STORE_NAME: payload.storeName || '',
+      STORE_NAME: payload.storeName || 'Unknown store',
+      PRICE: payload.price || 'Unknown price',
     }),
     Priority: notificationMessage.PRIORITY.name,
     Tags: `store,${payload.stockStatus}`,
@@ -51,7 +53,7 @@ export async function sendNotification(payload: NotificationPayload): Promise<vo
 
 function getTemplateString(stockStatus: StockStatus): NotificationMessage {
   if (stockStatus === 'InStock') {
-    return { MESSAGE: 'Product is now in stock {{PRODUCT_NAME}}', PRIORITY: { name: 'max', rank: 1 } };
+    return { MESSAGE: 'Product is now in stock {{PRODUCT_NAME}} for {{PRICE}}', PRIORITY: { name: 'max', rank: 1 } };
   }
   return { MESSAGE: 'Product is out of stock {{PRODUCT_NAME}}', PRIORITY: { name: 'low', rank: 3 } };
 }

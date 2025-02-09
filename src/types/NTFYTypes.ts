@@ -5,6 +5,7 @@ export interface NotificationPayload {
   env: Env;
   imageUrl?: string;
   storeName?: StoreName;
+  price?: string;
   additionalActions?: NotificationAction[];
 }
 

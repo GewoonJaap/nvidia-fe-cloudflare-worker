@@ -3,7 +3,16 @@ import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
 import { ALTERNATE_STORE } from '../../const';
 
 export class AlternateApi {
-  public async fetchInventory(productUrl: string, env: Env): Promise<void> {
+  private stockStatus: Record<string, string> = {};
+  private storeKey: string = 'alternate_store';
+
+  constructor(private env: Env) {}
+
+  public async initializeStockStatus(): Promise<void> {
+    this.stockStatus = await getStockStatus(this.env, this.storeKey);
+  }
+
+  public async fetchInventory(productUrl: string): Promise<void> {
     const html = await this.fetchHtmlContent(productUrl);
     const productData = this.extractProductDataFromHtml(html);
 
@@ -13,14 +22,18 @@ export class AlternateApi {
     }
 
     const { price, image, availability } = productData;
-    const previousStatus = await getStockStatus(env, productUrl);
+    const previousStatus = this.stockStatus[productUrl];
 
     if (availability === 'InStock' && availability !== previousStatus) {
       const product = ALTERNATE_STORE.find(p => p.url === productUrl);
       const productName = product ? product.name : 'Unknown Product';
-      await sendAlternateNotification(productUrl, productName, availability, env, image);
-      await saveStockStatus(env, productUrl, availability);
+      await sendAlternateNotification(productUrl, productName, availability, this.env, image);
     }
+    this.stockStatus[productUrl] = availability;
+  }
+
+  public async saveStockStatus(): Promise<void> {
+    await saveStockStatus(this.env, this.storeKey, this.stockStatus);
   }
 
   private async fetchHtmlContent(url: string): Promise<string> {
@@ -54,7 +67,6 @@ export class AlternateApi {
 
     const ldJson = ldJsonSplit[1].split('</script>')[0];
     const productDatas = JSON.parse(ldJson);
-    console.log('alternate', productDatas[0]);
     const productData = productDatas[0];
 
     const price = productData.offers.price || 'N/A';

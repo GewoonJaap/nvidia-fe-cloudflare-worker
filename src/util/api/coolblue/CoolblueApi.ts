@@ -3,17 +3,29 @@ import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
 import { COOLBLUE_PRODUCTS } from '../../const';
 
 export class CoolblueApi {
-  public async fetchInventory(productUrl: string, env: Env): Promise<void> {
+  private stockStatus: Record<string, string> = {};
+
+  constructor(private env: Env) {}
+
+  public async initializeStockStatus(): Promise<void> {
+    this.stockStatus = await getStockStatus(this.env, 'coolblue_store');
+  }
+
+  public async fetchInventory(productUrl: string): Promise<void> {
     const html = await this.fetchHtmlContent(productUrl);
     const stockStatus = this.extractStockStatusFromHtml(html);
 
-    const previousStatus = await getStockStatus(env, productUrl);
+    const previousStatus = this.stockStatus[productUrl];
     if (stockStatus === 'on_stock' && stockStatus !== previousStatus) {
       const product = COOLBLUE_PRODUCTS.find(p => p.url === productUrl);
       const productName = product ? product.name : 'Unknown Product';
-      await sendCoolblueNotification(productUrl, productName, stockStatus, env);
-      await saveStockStatus(env, productUrl, stockStatus);
+      await sendCoolblueNotification(productUrl, productName, stockStatus, this.env);
     }
+    this.stockStatus[productUrl] = stockStatus;
+  }
+
+  public async saveStockStatus(): Promise<void> {
+    await saveStockStatus(this.env, 'coolblue_store', this.stockStatus);
   }
 
   private async fetchHtmlContent(url: string): Promise<string> {

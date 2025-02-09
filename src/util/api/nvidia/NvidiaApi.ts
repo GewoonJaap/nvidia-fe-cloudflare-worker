@@ -2,17 +2,26 @@ import { NvidiaStore } from '../../../types/ConstTypes';
 import { ApiResponse, ListMap } from '../../../types/NvidiaApiTypes';
 import { sendToNtfy } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
+import { StockApi } from '../../../types/StockApiTypes';
+import { NVIDIA_STORES } from '../../const';
 
-export class NvidiaApi {
+export class NvidiaApi implements StockApi {
   private stockStatus: Record<string, string> = {};
 
   constructor(private env: Env) {}
+  public async scanForStock(): Promise<void> {
+    await this.initializeStockStatus();
+    for (const store of NVIDIA_STORES) {
+      await this.fetchInventory(store);
+    }
+    await this.saveStockStatus();
+  }
 
-  public async initializeStockStatus(): Promise<void> {
+  private async initializeStockStatus(): Promise<void> {
     this.stockStatus = await getStockStatus(this.env, 'nvidia_store');
   }
 
-  public async fetchInventory(store: NvidiaStore): Promise<ListMap[]> {
+  private async fetchInventory(store: NvidiaStore): Promise<ListMap[]> {
     console.log('Fetching inventory for store:', store);
     const results: ListMap[] = [];
 
@@ -68,7 +77,7 @@ export class NvidiaApi {
     return results;
   }
 
-  public async saveStockStatus(): Promise<void> {
+  private async saveStockStatus(): Promise<void> {
     await saveStockStatus(this.env, 'nvidia_store', this.stockStatus);
   }
 

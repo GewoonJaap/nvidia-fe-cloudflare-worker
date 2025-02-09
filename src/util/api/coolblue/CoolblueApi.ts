@@ -1,17 +1,25 @@
 import { sendCoolblueNotification } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
 import { COOLBLUE_PRODUCTS } from '../../const';
+import { StockApi } from '../../../types/StockApiTypes';
 
-export class CoolblueApi {
+export class CoolblueApi implements StockApi {
   private stockStatus: Record<string, string> = {};
 
   constructor(private env: Env) {}
+  public async scanForStock(): Promise<void> {
+    await this.initializeStockStatus();
+    for (const product of COOLBLUE_PRODUCTS) {
+      await this.fetchInventory(product.url);
+    }
+    await this.saveStockStatus();
+  }
 
-  public async initializeStockStatus(): Promise<void> {
+  private async initializeStockStatus(): Promise<void> {
     this.stockStatus = await getStockStatus(this.env, 'coolblue_store');
   }
 
-  public async fetchInventory(productUrl: string): Promise<void> {
+  private async fetchInventory(productUrl: string): Promise<void> {
     const html = await this.fetchHtmlContent(productUrl);
     const stockStatus = this.extractStockStatusFromHtml(html);
 
@@ -24,7 +32,7 @@ export class CoolblueApi {
     this.stockStatus[productUrl] = stockStatus;
   }
 
-  public async saveStockStatus(): Promise<void> {
+  private async saveStockStatus(): Promise<void> {
     await saveStockStatus(this.env, 'coolblue_store', this.stockStatus);
   }
 

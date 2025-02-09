@@ -1,12 +1,21 @@
 import { sendAlternateNotification } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
 import { ALTERNATE_STORE } from '../../const';
+import { StockApi } from '../../../types/StockApiTypes';
 
-export class AlternateApi {
+export class AlternateApi implements StockApi {
   private stockStatus: Record<string, string> = {};
   private storeKey: string = 'alternate_store';
 
   constructor(private env: Env) {}
+
+  async scanForStock(): Promise<void> {
+    await this.initializeStockStatus();
+    for (const product of ALTERNATE_STORE) {
+      await this.fetchInventory(product.url);
+    }
+    await this.saveStockStatus();
+  }
 
   public async initializeStockStatus(): Promise<void> {
     this.stockStatus = await getStockStatus(this.env, this.storeKey);

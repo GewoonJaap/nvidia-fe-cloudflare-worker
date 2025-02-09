@@ -1,17 +1,26 @@
 import { sendBolNotification } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
 import { BOL_PRODUCTS } from '../../const';
+import { StockApi } from '../../../types/StockApiTypes';
 
-export class BolApi {
+export class BolApi implements StockApi {
   private stockStatus: Record<string, string> = {};
 
   constructor(private env: Env) {}
 
-  public async initializeStockStatus(): Promise<void> {
+  public async scanForStock(): Promise<void> {
+    await this.initializeStockStatus();
+    for (const product of BOL_PRODUCTS) {
+      await this.fetchInventory(product.url);
+    }
+    await this.saveStockStatus();
+  }
+
+  private async initializeStockStatus(): Promise<void> {
     this.stockStatus = await getStockStatus(this.env, 'bol_store');
   }
 
-  public async fetchInventory(productUrl: string): Promise<void> {
+  private async fetchInventory(productUrl: string): Promise<void> {
     const html = await this.fetchHtmlContent(productUrl);
     const stockStatus = this.extractStockStatusFromHtml(html);
 
@@ -24,7 +33,7 @@ export class BolApi {
     this.stockStatus[productUrl] = stockStatus;
   }
 
-  public async saveStockStatus(): Promise<void> {
+  private async saveStockStatus(): Promise<void> {
     await saveStockStatus(this.env, 'bol_store', this.stockStatus);
   }
 

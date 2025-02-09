@@ -263,3 +263,61 @@ function determineGpuSeries(productName: string): string | null {
   }
   return null;
 }
+
+export async function sendMindfactoryNotification(
+  productUrl: string,
+  productName: string,
+  stockStatus: string,
+  env: Env,
+  imageUrl?: string
+): Promise<void> {
+  console.log('Sending notification to NTFY for Mindfactory product:', productName);
+  const notificationMessage = getMindfactoryTemplateString(stockStatus);
+  const bodyObject = {
+    topic: env.NTFY_TOPIC,
+    message: renderTemplateString(notificationMessage.MESSAGE, {
+      PRODUCT_NAME: productName,
+      STOCK_STATUS: stockStatus,
+    }),
+    actions: [
+      {
+        action: 'view',
+        label: 'View Product',
+        url: productUrl,
+      },
+    ],
+  };
+
+  const headers: Record<string, string> = {
+    Title: renderTemplateString(notificationMessage.MESSAGE, {
+      PRODUCT_NAME: productName,
+      STOCK_STATUS: stockStatus,
+    }),
+    Priority: notificationMessage.PRIORITY.name,
+    Tags: `mindfactory,${stockStatus}`,
+    Authorization: 'Bearer ' + env.NTFY_BEARER,
+  };
+
+  if (imageUrl) {
+    headers.Attach = imageUrl;
+  }
+
+  await postToNtfy(env.NTFY_URL, bodyObject, headers);
+
+  // Determine GPU series and send notification to series-specific topic
+  const gpuSeries = determineGpuSeries(productName);
+  if (gpuSeries) {
+    const seriesTopic = env[`NTFY_TOPIC_${gpuSeries}`];
+    if (seriesTopic) {
+      bodyObject.topic = seriesTopic;
+      await postToNtfy(env.NTFY_URL, bodyObject, headers);
+    }
+  }
+}
+
+function getMindfactoryTemplateString(stockStatus: string): { MESSAGE: string; PRIORITY: { name: string; rank: number } } {
+  if (stockStatus === 'InStock') {
+    return { MESSAGE: 'Mindfactory product is now in stock {{PRODUCT_NAME}}', PRIORITY: { name: 'max', rank: 1 } };
+  }
+  return { MESSAGE: 'Mindfactory product is out of stock {{PRODUCT_NAME}}', PRIORITY: { name: 'low', rank: 3 } };
+}

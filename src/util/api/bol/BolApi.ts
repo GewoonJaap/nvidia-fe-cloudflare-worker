@@ -41,8 +41,8 @@ export class BolApi implements StockApi {
           storeName: 'Bol',
           imageUrl: stockStatus.image,
         });
-        this.stockStatus[product.url] = stockStatus.availability;
       }
+      this.stockStatus[product.url] = stockStatus.availability;
     }
   }
 

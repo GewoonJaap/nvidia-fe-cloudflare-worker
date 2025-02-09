@@ -15,7 +15,7 @@ async function checkAllStores(env: Env) {
     try {
       await stockApi.scanForStock();
     } catch (ex: unknown) {
-      console.warn(`Failled getting stock...`);
+      console.warn(`Failled getting stock...`, ex);
     }
   }
 }

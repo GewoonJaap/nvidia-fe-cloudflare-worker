@@ -23,13 +23,19 @@ export class CoolblueApi implements StockApi {
 
   private async fetchInventory(productUrl: string): Promise<void> {
     const html = await this.fetchHtmlContent(productUrl);
-    const stockStatus = this.extractStockStatusFromHtml(html);
+    const productData = this.extractProductDataFromHtml(html);
 
+    if (!productData) {
+      console.log(`Failed to extract product data from ${productUrl}`);
+      return;
+    }
+
+    const { availability, image } = productData;
     const previousStatus = this.stockStatus[productUrl];
 
-    console.log(`Fetched status for: ${productUrl}:`, stockStatus, 'Previous status:', previousStatus);
+    console.log(`Fetched status for: ${productUrl}:`, availability, 'Previous status:', previousStatus);
 
-    if (stockStatus === 'on_stock' && stockStatus !== previousStatus) {
+    if (availability === 'InStock' && availability !== previousStatus) {
       const product = COOLBLUE_PRODUCTS.find(p => p.url === productUrl);
       const productName = product ? product.name : 'Unknown Product';
       await sendNotification({
@@ -38,9 +44,10 @@ export class CoolblueApi implements StockApi {
         stockStatus: 'InStock',
         env: this.env,
         storeName: 'Coolblue',
+        imageUrl: image,
       });
     }
-    this.stockStatus[productUrl] = stockStatus;
+    this.stockStatus[productUrl] = availability;
   }
 
   private async saveStockStatus(): Promise<void> {
@@ -70,15 +77,18 @@ export class CoolblueApi implements StockApi {
     return response.text();
   }
 
-  private extractStockStatusFromHtml(html: string): string {
-    const gaDataSplit = html.split('window.cb.gaData = ');
-    if (gaDataSplit.length < 2) {
-      return 'stock_status not found';
+  private extractProductDataFromHtml(html: string): { availability: string; image?: string } | null {
+    const ldJsonSplit = html.split('<script type="application/ld+json">');
+    if (ldJsonSplit.length < 2) {
+      return null;
     }
 
-    const gaDataJson = gaDataSplit[1].split('};')[0] + '}';
-    const gaData = JSON.parse(gaDataJson);
+    const ldJson = ldJsonSplit[1].split('</script>')[0];
+    const productData = JSON.parse(ldJson);
 
-    return gaData.contextParams.stock_status || 'stock_status not found';
+    const availability = productData.offers.availability.split('/').pop() || 'OutOfStock';
+    const image = productData.image || undefined;
+
+    return { availability, image };
   }
 }

@@ -12,7 +12,11 @@ async function checkAllStores(env: Env) {
   const stockApis: StockApi[] = [new NvidiaApi(env), new CoolblueApi(env), new BolApi(env), new AlternateApi(env), new MindfactoryApi(env)];
 
   for (const stockApi of stockApis) {
-    await stockApi.scanForStock();
+    try {
+      await stockApi.scanForStock();
+    } catch (ex: unknown) {
+      console.warn(`Failled getting stock...`);
+    }
   }
 }
 

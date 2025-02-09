@@ -1,14 +1,16 @@
-import { sendCoolblueNotification } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
 import { COOLBLUE_PRODUCTS } from '../../const';
 import { StockApi } from '../../../types/StockApiTypes';
+import { sendNotification } from '../../ntfy/NTFYConnection';
 
 export class CoolblueApi implements StockApi {
   private stockStatus: Record<string, string> = {};
 
   constructor(private env: Env) {}
+
   public async scanForStock(): Promise<void> {
     await this.initializeStockStatus();
+    console.log(`Checking coolblue stock status for: ${COOLBLUE_PRODUCTS.length} products...`);
     for (const product of COOLBLUE_PRODUCTS) {
       await this.fetchInventory(product.url);
     }
@@ -24,10 +26,19 @@ export class CoolblueApi implements StockApi {
     const stockStatus = this.extractStockStatusFromHtml(html);
 
     const previousStatus = this.stockStatus[productUrl];
+
+    console.log(`Fetched status for: ${productUrl}:`, stockStatus, 'Previous status:', previousStatus);
+
     if (stockStatus === 'on_stock' && stockStatus !== previousStatus) {
       const product = COOLBLUE_PRODUCTS.find(p => p.url === productUrl);
       const productName = product ? product.name : 'Unknown Product';
-      await sendCoolblueNotification(productUrl, productName, stockStatus, this.env);
+      await sendNotification({
+        productUrl,
+        productName,
+        stockStatus: 'InStock',
+        env: this.env,
+        storeName: 'Coolblue',
+      });
     }
     this.stockStatus[productUrl] = stockStatus;
   }

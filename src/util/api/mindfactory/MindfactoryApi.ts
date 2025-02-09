@@ -1,6 +1,6 @@
 import { StockApi } from '../../../types/StockApiTypes';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
-import { sendMindfactoryNotification } from '../../ntfy/NTFYConnection';
+import { sendNotification } from '../../ntfy/NTFYConnection';
 import { MindfactoryApiResponse, MindfactoryProduct } from '../../../types/MindfactoryApiTypes';
 
 export class MindfactoryApi implements StockApi {
@@ -25,11 +25,22 @@ export class MindfactoryApi implements StockApi {
 
     for (const query of this.searchQueries) {
       const products = await this.searchProducts(query);
+      console.log(`Getting mindfactory products for category: ${query}, fetched ${products.length} products`);
       for (const product of products) {
         currentStock[product.link] = 'in_stock';
         const previousStatus = this.stockStatus[product.link];
+
+        console.log(`Fetched status for: ${product.link}:`, 'In Stock', 'Previous status:', previousStatus);
+
         if (previousStatus !== 'in_stock') {
-          await sendMindfactoryNotification(product.link, product.text, 'InStock', this.env, product.image);
+          await sendNotification({
+            productUrl: product.link,
+            productName: product.text,
+            stockStatus: 'InStock',
+            env: this.env,
+            imageUrl: product.image,
+            storeName: 'Mindfactory',
+          });
         }
       }
     }
@@ -68,7 +79,8 @@ export class MindfactoryApi implements StockApi {
       },
     });
     if (!response.ok) {
-      throw new Error(`Failed to fetch data from ${url}`);
+      console.warn(`Something went wrong while getting mindfactory products for query: ${query}.`, response.status, await response.text());
+      return [];
     }
     const data: MindfactoryApiResponse = await response.json();
     return data.products;

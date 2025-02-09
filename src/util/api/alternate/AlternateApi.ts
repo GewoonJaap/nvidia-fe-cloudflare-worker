@@ -1,4 +1,4 @@
-import { sendAlternateNotification } from '../../ntfy/NTFYConnection';
+import { sendNotification } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
 import { ALTERNATE_STORE } from '../../const';
 import { StockApi } from '../../../types/StockApiTypes';
@@ -36,7 +36,14 @@ export class AlternateApi implements StockApi {
     if (availability === 'InStock' && availability !== previousStatus) {
       const product = ALTERNATE_STORE.find(p => p.url === productUrl);
       const productName = product ? product.name : 'Unknown Product';
-      await sendAlternateNotification(productUrl, productName, availability, this.env, image);
+      await sendNotification({
+        productUrl,
+        productName,
+        stockStatus: 'InStock',
+        env: this.env,
+        imageUrl: image,
+        storeName: 'Alternate',
+      });
     }
     this.stockStatus[productUrl] = availability;
   }
@@ -68,7 +75,7 @@ export class AlternateApi implements StockApi {
     return response.text();
   }
 
-  private extractProductDataFromHtml(html: string): { price: string; image: string; availability: string } | null {
+  private extractProductDataFromHtml(html: string): { price: string; image?: string; availability: string } | null {
     const ldJsonSplit = html.split('<script type="application/ld+json">');
     if (ldJsonSplit.length < 2) {
       return null;
@@ -79,7 +86,7 @@ export class AlternateApi implements StockApi {
     const productData = productDatas[0];
 
     const price = productData.offers.price || 'N/A';
-    const image = productData.image || '';
+    const image = productData.image || undefined;
     const availability = productData.offers.availability || 'OutOfStock';
 
     return { price, image, availability };

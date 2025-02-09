@@ -1,6 +1,6 @@
 import { NvidiaStore } from '../../../types/ConstTypes';
 import { ApiResponse, ListMap } from '../../../types/NvidiaApiTypes';
-import { sendToNtfy } from '../../ntfy/NTFYConnection';
+import { sendNotification } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
 import { StockApi } from '../../../types/StockApiTypes';
 import { NVIDIA_STORES } from '../../const';
@@ -9,6 +9,7 @@ export class NvidiaApi implements StockApi {
   private stockStatus: Record<string, string> = {};
 
   constructor(private env: Env) {}
+
   public async scanForStock(): Promise<void> {
     await this.initializeStockStatus();
     for (const store of NVIDIA_STORES) {
@@ -63,7 +64,20 @@ export class NvidiaApi implements StockApi {
         const isInStock = product.is_active !== 'false';
 
         if (isInStock && previousStatus !== 'in_stock') {
-          await sendToNtfy(product, store, productApi, this.env, true);
+          await sendNotification({
+            productUrl: product.product_url,
+            productName: product.fe_sku,
+            stockStatus: 'InStock',
+            env: this.env,
+            storeName: 'Nvidia',
+            additionalActions: [
+              {
+                action: 'view',
+                label: 'NVIDIA Marketplace',
+                url: productApi.consumerUrl,
+              },
+            ],
+          });
         }
 
         if (previousStatus !== (isInStock ? 'in_stock' : 'out_of_stock')) {

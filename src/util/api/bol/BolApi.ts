@@ -79,9 +79,9 @@ export class BolApi implements StockApi {
     const productData = JSON.parse(ldJson);
 
     if (productData.hasVariant && Array.isArray(productData.hasVariant) && productData.hasVariant.length > 0) {
-      return { availability: productData.hasVariant[0].offers.availability || 'OutOfStock', image: productData.hasVariant[0].image?.image };
+      return { availability: productData.hasVariant[0].offers.availability || 'OutOfStock', image: productData.hasVariant[0].image?.url };
     }
 
-    return { availability: productData.offers.availability || 'OutOfStock', image: productData.image?.image };
+    return { availability: productData.offers.availability || 'OutOfStock', image: productData.image?.url };
   }
 }

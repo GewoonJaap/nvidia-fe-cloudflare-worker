@@ -1,15 +1,11 @@
-export async function saveStockStatus(env: Env, key: string, status: string): Promise<void> {
-  await env.NVIDIA_FE_KV.put(key, status);
+export async function saveStockStatus(env: Env, storeKey: string, newStatus: Record<string, string>): Promise<void> {
+  const oldStatus = await getStockStatus(env, storeKey);
+  if (JSON.stringify(oldStatus) !== JSON.stringify(newStatus)) {
+    await env.NVIDIA_FE_KV.put(storeKey, JSON.stringify(newStatus));
+  }
 }
 
-export async function getStockStatus(env: Env, key: string): Promise<string | null> {
-  return await env.NVIDIA_FE_KV.get(key);
-}
-
-export async function saveCoolblueStockStatus(env: Env, key: string, status: string): Promise<void> {
-  await env.NVIDIA_FE_KV.put(`coolblue_${key}`, status);
-}
-
-export async function getCoolblueStockStatus(env: Env, key: string): Promise<string | null> {
-  return await env.NVIDIA_FE_KV.get(`coolblue_${key}`);
+export async function getStockStatus(env: Env, storeKey: string): Promise<Record<string, string>> {
+  const status = await env.NVIDIA_FE_KV.get(storeKey);
+  return status ? JSON.parse(status) : {};
 }

@@ -1,19 +1,58 @@
-import { sendCoolblueNotification } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
 import { COOLBLUE_PRODUCTS } from '../../const';
+import { StockApi } from '../../../types/StockApiTypes';
+import { sendNotification } from '../../ntfy/NTFYConnection';
 
-export class CoolblueApi {
-  public async fetchInventory(productUrl: string, env: Env): Promise<void> {
+export class CoolblueApi implements StockApi {
+  private stockStatus: Record<string, string> = {};
+
+  constructor(private env: Env) {}
+
+  public async scanForStock(): Promise<void> {
+    await this.initializeStockStatus();
+    console.log(`Checking coolblue stock status for: ${COOLBLUE_PRODUCTS.length} products...`);
+    for (const product of COOLBLUE_PRODUCTS) {
+      await this.fetchInventory(product.url);
+    }
+    await this.saveStockStatus();
+  }
+
+  private async initializeStockStatus(): Promise<void> {
+    this.stockStatus = await getStockStatus(this.env, 'coolblue_store');
+  }
+
+  private async fetchInventory(productUrl: string): Promise<void> {
     const html = await this.fetchHtmlContent(productUrl);
-    const stockStatus = this.extractStockStatusFromHtml(html);
+    const productData = this.extractProductDataFromHtml(html);
 
-    const previousStatus = await getStockStatus(env, productUrl);
-    if (stockStatus === 'on_stock' && stockStatus !== previousStatus) {
+    if (!productData) {
+      console.log(`Failed to extract product data from ${productUrl}`);
+      return;
+    }
+
+    const { availability, image, price } = productData;
+    const previousStatus = this.stockStatus[productUrl];
+
+    console.log(`Fetched status for: ${productUrl}:`, availability, 'Previous status:', previousStatus);
+
+    if (availability === 'InStock' && availability !== previousStatus) {
       const product = COOLBLUE_PRODUCTS.find(p => p.url === productUrl);
       const productName = product ? product.name : 'Unknown Product';
-      await sendCoolblueNotification(productUrl, productName, stockStatus, env);
-      await saveStockStatus(env, productUrl, stockStatus);
+      await sendNotification({
+        productUrl,
+        productName,
+        stockStatus: 'InStock',
+        env: this.env,
+        storeName: 'Coolblue',
+        imageUrl: image,
+        price,
+      });
     }
+    this.stockStatus[productUrl] = availability;
+  }
+
+  private async saveStockStatus(): Promise<void> {
+    await saveStockStatus(this.env, 'coolblue_store', this.stockStatus);
   }
 
   private async fetchHtmlContent(url: string): Promise<string> {
@@ -39,15 +78,19 @@ export class CoolblueApi {
     return response.text();
   }
 
-  private extractStockStatusFromHtml(html: string): string {
-    const gaDataSplit = html.split('window.cb.gaData = ');
-    if (gaDataSplit.length < 2) {
-      return 'stock_status not found';
+  private extractProductDataFromHtml(html: string): { availability: string; image?: string; price?: string } | null {
+    const ldJsonSplit = html.split('<script type="application/ld+json">');
+    if (ldJsonSplit.length < 2) {
+      return null;
     }
 
-    const gaDataJson = gaDataSplit[1].split('};')[0] + '}';
-    const gaData = JSON.parse(gaDataJson);
+    const ldJson = ldJsonSplit[1].split('</script>')[0];
+    const productData = JSON.parse(ldJson);
 
-    return gaData.contextParams.stock_status || 'stock_status not found';
+    const availability = productData.offers.availability.split('/').pop() || 'OutOfStock';
+    const image = productData.image || undefined;
+    const price = productData.offers.price || undefined;
+
+    return { availability, image, price };
   }
 }

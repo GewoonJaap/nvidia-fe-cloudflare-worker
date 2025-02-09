@@ -1,19 +1,49 @@
-import { sendBolNotification } from '../../ntfy/NTFYConnection';
+import { sendNotification } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
 import { BOL_PRODUCTS } from '../../const';
+import { StockApi } from '../../../types/StockApiTypes';
 
-export class BolApi {
-  public async fetchInventory(productUrl: string, env: Env): Promise<void> {
-    const html = await this.fetchHtmlContent(productUrl);
-    const stockStatus = this.extractStockStatusFromHtml(html);
+export class BolApi implements StockApi {
+  private stockStatus: Record<string, string> = {};
 
-    const previousStatus = await getStockStatus(env, productUrl);
-    if (stockStatus === 'InStock' && stockStatus !== previousStatus) {
-      const product = BOL_PRODUCTS.find(p => p.url === productUrl);
-      const productName = product ? product.name : 'Unknown Product';
-      await sendBolNotification(productUrl, productName, stockStatus, env);
-      await saveStockStatus(env, productUrl, stockStatus);
+  constructor(private env: Env) {}
+
+  public async scanForStock(): Promise<void> {
+    await this.initializeStockStatus();
+    await this.fetchInventory();
+    await this.saveStockStatus();
+  }
+
+  private async initializeStockStatus(): Promise<void> {
+    this.stockStatus = await getStockStatus(this.env, 'bol_store');
+  }
+
+  private async fetchInventory(): Promise<void> {
+    console.log(`Checking bol stock for ${BOL_PRODUCTS.length} products...`);
+    for (const product of BOL_PRODUCTS) {
+      const html = await this.fetchHtmlContent(product.url);
+      const stockStatus = this.extractStockStatusFromHtml(html);
+
+      const previousStatus = this.stockStatus[product.url];
+
+      console.log(`Fetched status for: ${product.url}:`, stockStatus, 'Previous status:', previousStatus);
+
+      if (stockStatus.availability === 'InStock' && stockStatus.availability !== previousStatus) {
+        await sendNotification({
+          productUrl: product.url,
+          productName: product.name,
+          stockStatus: 'InStock',
+          env: this.env,
+          storeName: 'Bol',
+          imageUrl: stockStatus.image,
+        });
+        this.stockStatus[product.url] = stockStatus.availability;
+      }
     }
+  }
+
+  private async saveStockStatus(): Promise<void> {
+    await saveStockStatus(this.env, 'bol_store', this.stockStatus);
   }
 
   private async fetchHtmlContent(url: string): Promise<string> {
@@ -39,19 +69,19 @@ export class BolApi {
     return response.text();
   }
 
-  private extractStockStatusFromHtml(html: string): string {
+  private extractStockStatusFromHtml(html: string): { availability: string; image?: string } {
     const ldJsonSplit = html.split('<script type="application/ld+json">');
     if (ldJsonSplit.length < 2) {
-      return 'OutOfStock';
+      return { availability: 'OutOfStock' };
     }
 
     const ldJson = ldJsonSplit[1].split('</script>')[0];
     const productData = JSON.parse(ldJson);
 
     if (productData.hasVariant && Array.isArray(productData.hasVariant) && productData.hasVariant.length > 0) {
-      return productData.hasVariant[0].offers.availability || 'OutOfStock';
+      return { availability: productData.hasVariant[0].offers.availability || 'OutOfStock', image: productData.hasVariant[0].image?.url };
     }
 
-    return productData.offers.availability || 'OutOfStock';
+    return { availability: productData.offers.availability || 'OutOfStock', image: productData.image?.url };
   }
 }

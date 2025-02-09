@@ -1,10 +1,28 @@
 import { NvidiaStore } from '../../../types/ConstTypes';
 import { ApiResponse, ListMap } from '../../../types/NvidiaApiTypes';
-import { sendToNtfy } from '../../ntfy/NTFYConnection';
+import { sendNotification } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
+import { StockApi } from '../../../types/StockApiTypes';
+import { NVIDIA_STORES } from '../../const';
 
-export class NvidiaApi {
-  public async fetchInventory(store: NvidiaStore, env: Env): Promise<ListMap[]> {
+export class NvidiaApi implements StockApi {
+  private stockStatus: Record<string, string> = {};
+
+  constructor(private env: Env) {}
+
+  public async scanForStock(): Promise<void> {
+    await this.initializeStockStatus();
+    for (const store of NVIDIA_STORES) {
+      await this.fetchInventory(store);
+    }
+    await this.saveStockStatus();
+  }
+
+  private async initializeStockStatus(): Promise<void> {
+    this.stockStatus = await getStockStatus(this.env, 'nvidia_store');
+  }
+
+  private async fetchInventory(store: NvidiaStore): Promise<ListMap[]> {
     console.log('Fetching inventory for store:', store);
     const results: ListMap[] = [];
 
@@ -42,15 +60,28 @@ export class NvidiaApi {
       for (const product of purchasableProducts) {
         product.fe_sku = sku;
 
-        const previousStatus = await getStockStatus(env, sku);
+        const previousStatus = this.stockStatus[sku];
         const isInStock = product.is_active !== 'false';
 
         if (isInStock && previousStatus !== 'in_stock') {
-          await sendToNtfy(product, store, productApi, env, true);
+          await sendNotification({
+            productUrl: product.product_url,
+            productName: product.fe_sku,
+            stockStatus: 'InStock',
+            env: this.env,
+            storeName: 'Nvidia',
+            additionalActions: [
+              {
+                action: 'view',
+                label: 'NVIDIA Marketplace',
+                url: productApi.consumerUrl,
+              },
+            ],
+          });
         }
 
         if (previousStatus !== (isInStock ? 'in_stock' : 'out_of_stock')) {
-          await saveStockStatus(env, sku, isInStock ? 'in_stock' : 'out_of_stock');
+          this.stockStatus[sku] = isInStock ? 'in_stock' : 'out_of_stock';
         }
       }
 
@@ -58,6 +89,10 @@ export class NvidiaApi {
     }
 
     return results;
+  }
+
+  private async saveStockStatus(): Promise<void> {
+    await saveStockStatus(this.env, 'nvidia_store', this.stockStatus);
   }
 
   private async fetchHtmlContent(url: string): Promise<string> {

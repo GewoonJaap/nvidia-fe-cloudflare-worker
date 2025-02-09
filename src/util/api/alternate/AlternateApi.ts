@@ -1,9 +1,27 @@
-import { sendAlternateNotification } from '../../ntfy/NTFYConnection';
+import { sendNotification } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
 import { ALTERNATE_STORE } from '../../const';
+import { StockApi } from '../../../types/StockApiTypes';
 
-export class AlternateApi {
-  public async fetchInventory(productUrl: string, env: Env): Promise<void> {
+export class AlternateApi implements StockApi {
+  private stockStatus: Record<string, string> = {};
+  private storeKey: string = 'alternate_store';
+
+  constructor(private env: Env) {}
+
+  async scanForStock(): Promise<void> {
+    await this.initializeStockStatus();
+    for (const product of ALTERNATE_STORE) {
+      await this.fetchInventory(product.url);
+    }
+    await this.saveStockStatus();
+  }
+
+  public async initializeStockStatus(): Promise<void> {
+    this.stockStatus = await getStockStatus(this.env, this.storeKey);
+  }
+
+  public async fetchInventory(productUrl: string): Promise<void> {
     const html = await this.fetchHtmlContent(productUrl);
     const productData = this.extractProductDataFromHtml(html);
 
@@ -13,14 +31,26 @@ export class AlternateApi {
     }
 
     const { price, image, availability } = productData;
-    const previousStatus = await getStockStatus(env, productUrl);
+    const previousStatus = this.stockStatus[productUrl];
 
     if (availability === 'InStock' && availability !== previousStatus) {
       const product = ALTERNATE_STORE.find(p => p.url === productUrl);
       const productName = product ? product.name : 'Unknown Product';
-      await sendAlternateNotification(productUrl, productName, availability, env, image);
-      await saveStockStatus(env, productUrl, availability);
+      await sendNotification({
+        productUrl,
+        productName,
+        stockStatus: 'InStock',
+        env: this.env,
+        imageUrl: image,
+        storeName: 'Alternate',
+        price: price,
+      });
     }
+    this.stockStatus[productUrl] = availability;
+  }
+
+  public async saveStockStatus(): Promise<void> {
+    await saveStockStatus(this.env, this.storeKey, this.stockStatus);
   }
 
   private async fetchHtmlContent(url: string): Promise<string> {
@@ -46,7 +76,7 @@ export class AlternateApi {
     return response.text();
   }
 
-  private extractProductDataFromHtml(html: string): { price: string; image: string; availability: string } | null {
+  private extractProductDataFromHtml(html: string): { price: string; image?: string; availability: string } | null {
     const ldJsonSplit = html.split('<script type="application/ld+json">');
     if (ldJsonSplit.length < 2) {
       return null;
@@ -54,11 +84,10 @@ export class AlternateApi {
 
     const ldJson = ldJsonSplit[1].split('</script>')[0];
     const productDatas = JSON.parse(ldJson);
-    console.log('alternate', productDatas[0]);
     const productData = productDatas[0];
 
     const price = productData.offers.price || 'N/A';
-    const image = productData.image || '';
+    const image = productData.image || undefined;
     const availability = productData.offers.availability || 'OutOfStock';
 
     return { price, image, availability };

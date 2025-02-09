@@ -22,6 +22,10 @@ export class BolApi implements StockApi {
     console.log(`Checking bol stock for ${BOL_PRODUCTS.length} products...`);
     for (const product of BOL_PRODUCTS) {
       const html = await this.fetchHtmlContent(product.url);
+      if (!html) {
+        console.warn(`Failed to fetch for: `, product.url);
+        return;
+      }
       const stockStatus = this.extractStockStatusFromHtml(html);
 
       const previousStatus = this.stockStatus[product.url];
@@ -46,7 +50,7 @@ export class BolApi implements StockApi {
     await saveStockStatus(this.env, 'bol_store', this.stockStatus);
   }
 
-  private async fetchHtmlContent(url: string): Promise<string> {
+  private async fetchHtmlContent(url: string): Promise<string | undefined> {
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0',
@@ -64,7 +68,7 @@ export class BolApi implements StockApi {
       },
     });
     if (!response.ok) {
-      throw new Error(`Failed to fetch HTML content from ${url}`);
+      return undefined;
     }
     return response.text();
   }

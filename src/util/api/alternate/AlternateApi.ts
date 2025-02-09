@@ -33,6 +33,8 @@ export class AlternateApi implements StockApi {
     const { price, image, availability } = productData;
     const previousStatus = this.stockStatus[productUrl];
 
+    console.log(`Fetched status for: ${productUrl}:`, availability, 'Previous status:', previousStatus);
+
     if (availability === 'InStock' && availability !== previousStatus) {
       const product = ALTERNATE_STORE.find(p => p.url === productUrl);
       const productName = product ? product.name : 'Unknown Product';

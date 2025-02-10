@@ -1,6 +1,6 @@
 import { sendNotification } from '../../ntfy/NTFYConnection';
 import { saveStockStatus, getStockStatus } from '../../kv/KVHelper';
-import { BOL_PRODUCTS } from '../../const';
+import { BOL_PRODUCTS, BLACKLISTED_SELLERS } from '../../const';
 import { StockApi } from '../../../types/StockApiTypes';
 
 export class BolApi implements StockApi {
@@ -30,6 +30,12 @@ export class BolApi implements StockApi {
 
       if (!stockStatus) {
         return;
+      }
+
+      // Check if the seller is blacklisted
+      if (BLACKLISTED_SELLERS.includes(stockStatus.seller)) {
+        console.log(`Skipping product from blacklisted seller: ${stockStatus.seller}`);
+        continue;
       }
 
       const previousStatus = this.stockStatus[product.url];
@@ -78,7 +84,7 @@ export class BolApi implements StockApi {
     return response.text();
   }
 
-  private extractStockStatusFromHtml(html: string): { availability: string; image?: string; price?: string } | undefined {
+  private extractStockStatusFromHtml(html: string): { availability: string; image?: string; price?: string; seller?: string } | undefined {
     const ldJsonSplit = html.split('<script type="application/ld+json">');
     if (ldJsonSplit.length < 2) {
       return undefined;
@@ -92,9 +98,15 @@ export class BolApi implements StockApi {
         availability: productData.hasVariant[0].offers.availability || 'OutOfStock',
         image: productData.hasVariant[0].image?.url,
         price: productData.hasVariant[0].offers.price,
+        seller: productData.hasVariant[0].offers.seller?.name,
       };
     }
 
-    return { availability: productData.offers.availability || 'OutOfStock', image: productData.image?.url, price: productData.offers.price };
+    return { 
+      availability: productData.offers.availability || 'OutOfStock', 
+      image: productData.image?.url, 
+      price: productData.offers.price,
+      seller: productData.offers.seller?.name,
+    };
   }
 }

@@ -111,3 +111,5 @@ export const GPU_SERIES = {
   '5080': '5080',
   '5090': '5090',
 };
+
+export const BLACKLISTED_SELLERS = ['CYBRX'];

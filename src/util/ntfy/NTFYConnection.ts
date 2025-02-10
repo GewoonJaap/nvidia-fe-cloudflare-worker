@@ -30,7 +30,7 @@ export async function sendNotification(payload: NotificationPayload): Promise<vo
       PRICE: payload.price || 'Unknown price',
     }),
     Priority: notificationMessage.PRIORITY.name,
-    Tags: `store,${payload.stockStatus}`,
+    Tags: `${payload.storeName || 'Unknown store'},${payload.stockStatus}`,
     Authorization: 'Bearer ' + payload.env.NTFY_BEARER,
   };
 

@@ -74,6 +74,10 @@ export const BOL_PRODUCTS = [
     url: 'https://www.bol.com/nl/nl/p/geforce-rtx-5090-32g-suprim-soc/9300000222902224/?bltgh=hcwkFIRBhrt6cTzWHzRCHA.rXFS2igOoZh0hoM7YQFA3w_0_16.19.ProductImage',
     name: 'MSI GeForce RTX 5090 Suprim SOC',
   },
+  {
+    url: 'https://www.bol.com/nl/nl/p/gigabyte-geforce-rtx-5090-windforce-oc-32g-nvidia-32-gb-gddr7/9300000224382652',
+    name: 'GIGABYTE GeForce RTX 5090 WINDFORCE OC',
+  },
 ];
 
 export const ALTERNATE_STORE = [

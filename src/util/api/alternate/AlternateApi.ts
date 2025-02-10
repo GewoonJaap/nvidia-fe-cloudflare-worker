@@ -90,7 +90,11 @@ export class AlternateApi implements StockApi {
 
     const price = productData.offers.price || 'N/A';
     const image = productData.image || undefined;
-    const availability = productData.offers.availability || 'OutOfStock';
+    let availability = productData.offers.availability || 'OutOfStock';
+
+    if (html.includes('Artikel kann derzeit nicht gekauft werden')) {
+      availability = 'OutOfStock';
+    }
 
     return { price, image, availability };
   }

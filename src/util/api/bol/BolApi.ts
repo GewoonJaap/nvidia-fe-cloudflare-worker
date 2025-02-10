@@ -44,6 +44,7 @@ export class BolApi implements StockApi {
           env: this.env,
           storeName: 'Bol',
           imageUrl: stockStatus.image,
+          price: stockStatus.price,
         });
       }
       this.stockStatus[product.url] = stockStatus.availability;
@@ -77,7 +78,7 @@ export class BolApi implements StockApi {
     return response.text();
   }
 
-  private extractStockStatusFromHtml(html: string): { availability: string; image?: string } | undefined {
+  private extractStockStatusFromHtml(html: string): { availability: string; image?: string; price?: string } | undefined {
     const ldJsonSplit = html.split('<script type="application/ld+json">');
     if (ldJsonSplit.length < 2) {
       return undefined;
@@ -87,9 +88,13 @@ export class BolApi implements StockApi {
     const productData = JSON.parse(ldJson);
 
     if (productData.hasVariant && Array.isArray(productData.hasVariant) && productData.hasVariant.length > 0) {
-      return { availability: productData.hasVariant[0].offers.availability || 'OutOfStock', image: productData.hasVariant[0].image?.url };
+      return {
+        availability: productData.hasVariant[0].offers.availability || 'OutOfStock',
+        image: productData.hasVariant[0].image?.url,
+        price: productData.hasVariant[0].offers.price,
+      };
     }
 
-    return { availability: productData.offers.availability || 'OutOfStock', image: productData.image?.url };
+    return { availability: productData.offers.availability || 'OutOfStock', image: productData.image?.url, price: productData.offers.price };
   }
 }

@@ -53,9 +53,9 @@ export async function sendNotification(payload: NotificationPayload): Promise<vo
 
 function getTemplateString(stockStatus: StockStatus): NotificationMessage {
   if (stockStatus === 'InStock') {
-    return { MESSAGE: 'Product is now in stock {{PRODUCT_NAME}} for {{PRICE}}', PRIORITY: { name: 'max', rank: 1 } };
+    return { MESSAGE: '{{STORE_NAME}} - Product is now in stock {{PRODUCT_NAME}} for {{PRICE}}', PRIORITY: { name: 'max', rank: 1 } };
   }
-  return { MESSAGE: 'Product is out of stock {{PRODUCT_NAME}}', PRIORITY: { name: 'low', rank: 3 } };
+  return { MESSAGE: '{{STORE_NAME}} - Product is out of stock {{PRODUCT_NAME}}', PRIORITY: { name: 'low', rank: 3 } };
 }
 
 function determineGpuSeries(productName: string): string | null {

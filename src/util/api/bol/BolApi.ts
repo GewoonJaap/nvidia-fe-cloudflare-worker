@@ -33,8 +33,8 @@ export class BolApi implements StockApi {
       }
 
       // Check if the seller is blacklisted
-      if (BLACKLISTED_SELLERS.includes(stockStatus.seller)) {
-        console.log(`Skipping product from blacklisted seller: ${stockStatus.seller}`);
+      if (stockStatus.seller && BLACKLISTED_SELLERS.includes(stockStatus.seller)) {
+        console.log(`Skipping bol product ${product.name} from blacklisted seller: ${stockStatus.seller}`);
         continue;
       }
 
@@ -102,9 +102,9 @@ export class BolApi implements StockApi {
       };
     }
 
-    return { 
-      availability: productData.offers.availability || 'OutOfStock', 
-      image: productData.image?.url, 
+    return {
+      availability: productData.offers.availability || 'OutOfStock',
+      image: productData.image?.url,
       price: productData.offers.price,
       seller: productData.offers.seller?.name,
     };

@@ -24,12 +24,12 @@ export class BolApi implements StockApi {
       const html = await this.fetchHtmlContent(product.url);
       if (!html) {
         console.warn(`Failed to fetch for: `, product.url);
-        return;
+        continue;
       }
       const stockStatus = this.extractStockStatusFromHtml(html);
 
       if (!stockStatus) {
-        return;
+        continue;
       }
 
       // Check if the seller is blacklisted

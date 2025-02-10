@@ -28,6 +28,10 @@ export class BolApi implements StockApi {
       }
       const stockStatus = this.extractStockStatusFromHtml(html);
 
+      if (!stockStatus) {
+        return;
+      }
+
       const previousStatus = this.stockStatus[product.url];
 
       console.log(`Fetched status for: ${product.url}:`, stockStatus, 'Previous status:', previousStatus);
@@ -73,10 +77,10 @@ export class BolApi implements StockApi {
     return response.text();
   }
 
-  private extractStockStatusFromHtml(html: string): { availability: string; image?: string } {
+  private extractStockStatusFromHtml(html: string): { availability: string; image?: string } | undefined {
     const ldJsonSplit = html.split('<script type="application/ld+json">');
     if (ldJsonSplit.length < 2) {
-      return { availability: 'OutOfStock' };
+      return undefined;
     }
 
     const ldJson = ldJsonSplit[1].split('</script>')[0];

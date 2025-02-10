@@ -10,7 +10,7 @@
   "dependencies": {
     "hono": "^4.6.20",
     "mustache": "^4.2.0",
-    "prettier": "^3.4.2"
+    "prettier": "^3.5.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250109.0",

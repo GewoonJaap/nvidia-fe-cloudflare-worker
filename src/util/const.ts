@@ -39,6 +39,14 @@ export const COOLBLUE_PRODUCTS = [
     url: 'https://www.coolblue.nl/product/959793?utm_medium=android-app&utm_source=referral&utm_campaign=product-share',
     name: 'MSI GeForce RTX 5080 SUPRIM SOC',
   },
+  {
+    url: 'https://www.coolblue.be/nl/product/959798/msi-geforce-rtx-5080-ventus-3x-oc-plus-16gb.html',
+    name: 'MSI GeForce RTX 5080 VENTUS 3X OC PLUS 16GB',
+  },
+  {
+    url: 'https://www.coolblue.be/nl/product/960337/asus-prime-geforce-rtx-5080-oc-16gb.html',
+    name: 'ASUS PRIME GeForce RTX 5080 OC 16GB',
+  },
 ];
 
 export const BOL_PRODUCTS = [

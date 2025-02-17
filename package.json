@@ -8,7 +8,7 @@
     "format:check": "prettier --loglevel debug --check \"**/*.{js,ts,json,less,css,md,html}\""
   },
   "dependencies": {
-    "hono": "^4.7.0",
+    "hono": "^4.7.1",
     "mustache": "^4.2.0",
     "prettier": "^3.5.0"
   },

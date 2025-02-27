@@ -47,6 +47,10 @@ export const COOLBLUE_PRODUCTS = [
     url: 'https://www.coolblue.be/nl/product/960337/asus-prime-geforce-rtx-5080-oc-16gb.html',
     name: 'ASUS PRIME GeForce RTX 5080 OC 16GB',
   },
+  {
+    url: 'https://www.coolblue.nl/product/960281/inno3d-geforce-rtx-5090-x3-32gb.html',
+    name: 'Inno3D GeForce RTX 5090 X3 32GB',
+  },
 ];
 
 export const BOL_PRODUCTS = [

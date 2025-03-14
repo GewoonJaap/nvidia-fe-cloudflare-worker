@@ -64,12 +64,15 @@ export class NvidiaApi implements StockApi {
         const isInStock = product.is_active !== 'false';
 
         if (isInStock && previousStatus !== 'in_stock') {
+          const productData = this.extractProductDataFromHtml(html);
           await sendNotification({
             productUrl: product.product_url,
             productName: product.fe_sku,
             stockStatus: 'InStock',
             env: this.env,
             storeName: 'Nvidia',
+            imageUrl: productData?.image,
+            price: productData?.price,
             additionalActions: [
               {
                 action: 'view',
@@ -134,6 +137,22 @@ export class NvidiaApi implements StockApi {
     }
 
     return skuSplit[0];
+  }
+
+  private extractProductDataFromHtml(html: string): { price: string; image?: string } | null {
+    const ldJsonSplit = html.split('<script type="application/ld+json">');
+    if (ldJsonSplit.length < 2) {
+      return null;
+    }
+
+    const ldJson = ldJsonSplit[1].split('</script>')[0];
+    const productDatas = JSON.parse(ldJson);
+    const productData = productDatas[0];
+
+    const price = productData.offers.price || 'N/A';
+    const image = productData.image || undefined;
+
+    return { price, image };
   }
 
   private determineGpuSeries(productName: string): string | null {

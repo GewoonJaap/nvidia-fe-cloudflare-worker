@@ -302,10 +302,10 @@ glob-to-regexp@^0.4.1:
   resolved "https://registry.yarnpkg.com/glob-to-regexp/-/glob-to-regexp-0.4.1.tgz#c75297087c851b9a578bd217dd59a92f59fe546e"
   integrity sha512-lkX1HJXwyMcprw/5YUZc2s7DrpAiHB21/V+E1rHUrVNokkvB6bqMzT0VfV6/86ZNabt1k14YOIaT7nDvOX3Iiw==
 
-hono@^4.7.0:
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/hono/-/hono-4.7.0.tgz#ccd1f607c7e5501c70e508729cd8868ffbf7f72a"
-  integrity sha512-hV97aIR4WYbG30k234sD9B3VNr1ZWdQRmrVF76LKFlmI7O9Yo70mG9+mFwyQ6Sjrz4wH71GfnBxv6CPjcx3QNw==
+hono@^4.7.9:
+  version "4.7.9"
+  resolved "https://registry.yarnpkg.com/hono/-/hono-4.7.9.tgz#3a6eb29ab22da65607c00b36bc9010173b9d1cf2"
+  integrity sha512-/EsCoR5h7N4yu01TDu9GMCCJa6ZLk5ZJIWFFGNawAXmd1Tp53+Wir4xm0D2X19bbykWUlzQG0+BvPAji6p9E8Q==
 
 magic-string@^0.25.3:
   version "0.25.9"
